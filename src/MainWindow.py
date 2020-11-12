@@ -1,48 +1,67 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow,QComboBox,QPushButton
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel
 from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPainter,QPixmap
 
 import conexion #archivo de la conexión con Neo4j para hacer consultas
 
-#Para el background
-stylesheet = """
-    MainWindow {
-        background-image: url("../resources/ball-soccer-600x400"); 
-        background-repeat: no-repeat; 
-        background-position: center;
-    }
-"""
 
-class MainWindow(QMainWindow):
+class MainWindow(QWidget):#QMainWindow
+    
     def __init__(self,teams):
-        QMainWindow.__init__(self)
-
+        QWidget.__init__(self)#QMainWindow
+        
+        self.grid_layout = QGridLayout(self)
+        self.setLayout(self.grid_layout)
         self.setFixedSize(QSize(600, 400))    
         self.setWindowTitle("SAJEF") 
         self.teams = teams
         
-        team1 = QComboBox(self)
-        team1.move(50,10)
-        team2 = QComboBox(self)
-        team2.move(450,10)
-        acept = QPushButton("Aceptar",self)
-        acept.move(250,10)
+        self.team1 = QComboBox(self)
+        self.team2 = QComboBox(self)
+        self.elegir1 = QLabel("Elija el primer equipo")
+        self.elegir2 = QLabel("Elija el segundo equipo")
+        self.errorEquipo = QLabel("Ha elegido el mismo equipo")
+        self.errorEquipo.hide() #La ocultamos, solo aparecera para mostrar error
+        self.acept = QPushButton("Aceptar",self)
+        self.acept.clicked.connect(self.accept_button) #evento para manejar el click del boton aceptar
+        
+        self.grid_layout.addWidget(self.elegir1,0,0)
+        self.grid_layout.addWidget(self.errorEquipo,0,1)
+        self.grid_layout.addWidget(self.elegir2,0,2)
+        self.grid_layout.addWidget(self.team1,1,0)
+        self.grid_layout.addWidget(self.acept,1,1)
+        self.grid_layout.addWidget(self.team2,1,2)
 
         for item in teams:
-            team1.addItem(str(item))     
-            team2.addItem(str(item))
+            self.team1.addItem(item)     
+            self.team2.addItem(item)
 
+    def accept_button(self):
+        if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
+            self.errorEquipo.show()
+        else:
+            pass
+            
+        
+    #Para poner el background sobrescribimos el QWidget
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawPixmap(self.rect(), QPixmap("../resources/ball-soccer-600x400.jpg"))
+        QWidget.paintEvent(self, event)
+
+        
+        
+        
 if __name__ == "__main__":
     #Conexión y consulta
     conexion = conexion.Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
-    teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN c.id")
+    teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     conexion.close()
-    print(teams)
     
     #Ventana
     app = QtWidgets.QApplication(sys.argv)
     mainWin = MainWindow(teams)
-    mainWin.setStyleSheet(stylesheet)
     mainWin.show()
     sys.exit( app.exec_() )

@@ -13,23 +13,16 @@ class Neo4j:
     
     def query(self,query):
         with self.driver.session() as session:
-            query_result = session.write_transaction(self._create_and_return_greeting,query)
+            query_result = session.write_transaction(self._return_query,query)
             #print(query_result)
             return query_result
     
-    @staticmethod
-    def _create_and_return_greeting(tx,query):
+    @staticmethod #Tiene que ser estático no se porque
+    def _return_query(tx,query):
         result_query = tx.run(query)
         
-        result = set()
+        result = []
         for record in result_query:
-            result.add(record)
+            result.append(str(record.values())[2: -2: 1]) #Convertimos a cadena los valores y quitamos los corchetes y comillas simples
             
         return  result #result.single()
-
-"""
-if __name__ == "__main__":
-    conexion = Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
-    conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN c.id")
-    conexion.close()
-"""
