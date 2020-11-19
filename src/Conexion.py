@@ -14,7 +14,6 @@ class Neo4j:
     def query(self,query):
         with self.driver.session() as session:
             query_result = session.write_transaction(self._return_query,query)
-            #print(query_result)
             return query_result
     
     @staticmethod #Tiene que ser estático no se porque

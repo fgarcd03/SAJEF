@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPainter,QPixmap
 
-import conexion #archivo de la conexión con Neo4j para hacer consultas
+import Conexion #archivo de la conexión con Neo4j para hacer consultas
 
 
 class MainWindow(QWidget):#QMainWindow
@@ -56,7 +56,7 @@ class MainWindow(QWidget):#QMainWindow
         
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = conexion.Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     conexion.close()
     
