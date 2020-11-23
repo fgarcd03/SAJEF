@@ -1,8 +1,8 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QHBoxLayout
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPainter,QPixmap
+from PyQt5.QtGui import QPainter,QPixmap,QIcon
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algotirmo de calculo
@@ -15,31 +15,56 @@ class MainWindow(QWidget):#QMainWindow
         self.teams = teams
         self.conexion = conexion
         
-        self.grid_layout = QGridLayout(self)
-        self.setLayout(self.grid_layout)
-        self.setFixedSize(QSize(400, 200))    
+        self.gridLayout = QGridLayout(self)
+        self.setLayout(self.gridLayout)
+        self.setFixedSize(QSize(500, 300))    
         self.setWindowTitle("SAJEF") 
+        self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
         
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
         self.elegir1 = QLabel("Elija el primer equipo")
         self.elegir2 = QLabel("Elija el segundo equipo")
+        #Añadidos para hacer hueco
+        """
+        self.elegir3 = QLabel("")
+        self.elegir4 = QLabel("")
+        self.elegir5 = QLabel("")
+        self.elegir6 = QLabel("")
+        """
         self.acept = QPushButton("Aceptar",self)
         self.acept.clicked.connect(self.accept_button) #evento para manejar el click del boton aceptar
         
-        self.grid_layout.addWidget(self.elegir1,1,0)
-        self.grid_layout.addWidget(self.elegir2,1,2)
-        self.grid_layout.addWidget(self.team1,0,0)
-        self.grid_layout.addWidget(self.acept,0,1)
-        self.grid_layout.addWidget(self.team2,0,2)
+        self.gridLayout.addWidget(self.elegir1,0,0)
+        self.gridLayout.addWidget(self.elegir2,0,2)
+        """
+        self.gridLayout.addWidget(self.elegir3,2,0)
+        self.gridLayout.addWidget(self.elegir4,3,2)
+        self.gridLayout.addWidget(self.elegir5,4,0)
+        self.gridLayout.addWidget(self.elegir6,5,2)
+        """
+        self.gridLayout.addWidget(self.team1,1,0)
+        self.gridLayout.addWidget(self.acept,1,1)
+        self.gridLayout.addWidget(self.team2,1,2)
 
+
+
+        #self.hbox = QHBoxLayout()
+        #self.gridLayout.addLayout(self.hbox,2,1)
+        self.labelImage = QLabel(self)
+        self.pixmap = QPixmap("../resources/ball-soccer-600x400.jpg")
+        self.labelImage.setPixmap(self.pixmap)
+        self.gridLayout.addWidget(self.labelImage,2, 0, 2, 0)
+        #self.hbox.addWidget(self.labelImage)
 
         self.errorTeam = QErrorMessage()
         self.errorTeam.setFixedSize(250,150)
         
-        for item in teams:
+        for index,item in enumerate(teams):
             self.team1.addItem(item)     
             self.team2.addItem(item)
+            self.team1.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
+            self.team2.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
 
     def accept_button(self):
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
@@ -59,7 +84,7 @@ class MainWindow(QWidget):#QMainWindow
         
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
