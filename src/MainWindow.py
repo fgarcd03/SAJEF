@@ -42,13 +42,14 @@ class MainWindow(QWidget):#QMainWindow
 
         self.errorTeam = QErrorMessage()
         self.errorTeam.setFixedSize(250,150)
+    
         
         for index,item in enumerate(teams):
-            self.team1.addItem(item)     
-            self.team2.addItem(item)
+            self.team1.addItem(item[2:-2])     
+            self.team2.addItem(item[2:-2])
             self.team1.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
             self.team2.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
-
+            
     def accept_button(self):
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")

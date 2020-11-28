@@ -22,6 +22,6 @@ class Neo4j:
         
         result = []
         for record in result_query:
-            result.append(str(record.values())[2: -2: 1]) #Convertimos a cadena los valores y quitamos los corchetes y comillas simples
-            
+            #result.append(str(record.values())[2: -2: 1]) #Convertimos a cadena los valores y quitamos los corchetes y comillas simples
+            result.append(str(record.values()))
         return  result #result.single()
