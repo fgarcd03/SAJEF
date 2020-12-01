@@ -12,15 +12,16 @@ class Estimate:
 
         mainTeam1 = self.overallCalculation(mainTeam1)
         mainTeam2 = self.overallCalculation(mainTeam2)
-        print(mainTeam1)
-        print(mainTeam2)
         
         if (len(mainTeam1) or len(mainTeam2)) != 11:
             print("Error, tamaño de equipo incorrecto")
         else:
             #Hacer todo lo demás
-            pass
-        
+            pointsOverallMainTeam1,pointsOverallMainTeam2 = self.overallMainTeam(mainTeam1,mainTeam2)
+            pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(mainTeam1)
+            pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(mainTeam2)
+
+            
     def createMainTeam(self,conexion,team1,team2):#Táctica 4-3-3
         players1 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players2 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team2))
@@ -185,9 +186,35 @@ class Estimate:
                 
         return mainTeamReturn
                         
-                        
+    def overallMainTeam(self,mainTeam1,mainTeam2):
+        points1 = points2 = 0
+        for player1,player2 in zip(mainTeam1,mainTeam2):
+            points1 = points1 + int(player1.split(",")[2])
+            points2 = points2 + int(player2.split(",")[2])
+        return points1,points2
                 
+    def pointsOverallZone(self,mainTeam):
+        zoneDefense = []
+        zoneMidfield = [] 
+        zoneForward = [] #en la lista se almacena de cada zona la puntuacion de cada zona total junto a los jugadores
+        pointsDefense =  pointsMidfield = pointsForward = 0
         
+        for player in mainTeam:
+            if player.split(",")[1] == " GK" or player.split(",")[1] == " LB" or player.split(",")[1] == " LWB" or player.split(",")[1] == " LCB" or player.split(",")[1] == " RCB"  or player.split(",")[1] == " RB" or player.split(",")[1] == " RWB":
+                pointsDefense = pointsDefense + int(player.split(",")[2])
+                zoneDefense.append(player)        
+            if player.split(",")[1] == " CDM" or player.split(",")[1] == " CM" or player.split(",")[1] == " LCM" or player.split(",")[1] == " RCM" or player.split(",")[1] == " CAM":
+                pointsMidfield = pointsMidfield + int(player.split(",")[2])
+                zoneMidfield.append(player)
+            if player.split(",")[1] == " CF" or player.split(",")[1] == " ST" or player.split(",")[1] == " LW" or player.split(",")[1] == " RW":
+                pointsForward = pointsForward + int(player.split(",")[2])
+                zoneForward.append(player)
+        
+        zoneDefense.append(pointsDefense) #añadimos los puntos totales tambien
+        zoneMidfield.append(pointsMidfield)
+        zoneForward.append(pointsForward)
+        
+        return zoneDefense,zoneMidfield,zoneForward
         
     def filterTeam(self,players):
         mainTeam = []
@@ -196,19 +223,6 @@ class Estimate:
             pos = player.split(',')[-1] #cojemos el substring que almacena la posición del jugador
             if pos != " SUB" and pos != " RES" and pos != " " and pos != "" and pos != None:#Si no es un suplente o vacio lo añadimos a la lista de titulares
                 mainTeam.append(player)
+                
         return mainTeam
     
-    
-    """
-    #Borra la última ocurrencia de un char
-    def removeLastOccur(self,string, char):
-        string2 = ''
-        length = len(string)
-        i = 0
-    
-        while(i < length):
-            if(string[i] == char):
-                string2 = string[0 : i] + string[i + 1 : length]
-            i = i + 1
-        return string2
-    """
