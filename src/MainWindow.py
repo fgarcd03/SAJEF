@@ -1,8 +1,8 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QHBoxLayout
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPainter,QPixmap,QIcon
+from PyQt5.QtGui import QPixmap,QIcon
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algotirmo de calculo
