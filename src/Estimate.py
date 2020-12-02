@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+import os
 
 class Estimate:
     
@@ -7,12 +8,12 @@ class Estimate:
         self.conexion = conexion
         self.team1 = team1
         self.team2 = team2
-
+     
         mainTeam1,mainTeam2 = self.createMainTeam(self.conexion,self.team1,self.team2)
 
         mainTeam1 = self.overallCalculation(mainTeam1)
         mainTeam2 = self.overallCalculation(mainTeam2)
-        print(mainTeam1,mainTeam2)
+
         if (len(mainTeam1) or len(mainTeam2)) != 11:
             print("Error, tamaño de equipo incorrecto")
         else:
@@ -22,7 +23,42 @@ class Estimate:
             pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(mainTeam1)
             pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(mainTeam2)
             pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
+            
+            
+            file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe
+            self.fileWrite(file,mainTeam1)
+            self.fileWrite(file,mainTeam2)
+            self.fileWrite(file,pointsVSPlayers1)
+            self.fileWrite(file,pointsVSPlayer2)
+            self.fileWrite(file,pointsOverallMainTeam1)
+            self.fileWrite(file,pointsOverallMainTeam2)
+            self.fileWrite(file,pointsOverallDefense1)
+            self.fileWrite(file,pointsOverallMidfield1)
+            self.fileWrite(file,pointsOverallForward1)
+            self.fileWrite(file,pointsOverallDefense2)
+            self.fileWrite(file,pointsOverallMidfield2)
+            self.fileWrite(file,pointsOverallForward2)
+            self.fileWrite(file,pointsAttack1)
+            self.fileWrite(file,pointsDefense1)
+            self.fileWrite(file,pointsAttack2)
+            self.fileWrite(file,pointsDefense2)
+            self.fileWrite(file,team1)
+            self.fileWrite(file,team2)
 
+            
+            file.close()
+            
+            os.system("python3 ResultsWindow.py")
+                      
+
+    def fileWrite(self,file,listOrInt):
+        if isinstance(listOrInt, int) or isinstance(listOrInt, float) or isinstance(listOrInt, str):# si es int, float o cadena entra aquí si no será una lista
+            file.write("{}\n".format(listOrInt))
+        else:#añadimos cada list o int a una nueva linea del archivo
+            for item in listOrInt:
+                file.write("%s;" % item)
+            file.write("\n")  
+            
     def createMainTeam(self,conexion,team1,team2):
         players1 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players2 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team2))
@@ -259,7 +295,6 @@ class Estimate:
         for player2 in mainTeam2:
             pointsVS2 = pointsVS2 + int(player2.split(",")[2])
             
-        print(pointsVS1,pointsVS2)
         return pointsVS1,pointsVS2
     def filterTeam(self,players):
         mainTeam = []

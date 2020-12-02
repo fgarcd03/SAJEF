@@ -55,16 +55,15 @@ class MainWindow(QWidget):#QMainWindow
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText())) #creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
-            
         
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = Conexion.Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
     app = QtWidgets.QApplication(sys.argv)
-    mainWin = MainWindow(teams,conexion)
+    mainWin = MainWindow(teams,conexion) 
     mainWin.show()
     sys.exit( app.exec_() )
     
