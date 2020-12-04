@@ -48,7 +48,7 @@ class Estimate:
             
             file.close()
             
-            os.system("python3 ResultsWindow.py")
+            os.system("python3 ResultsWindow.py &")
                       
 
     def fileWrite(self,file,listOrInt):

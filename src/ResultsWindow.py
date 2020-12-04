@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys 
-from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QLineEdit,QLabel
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QLineEdit,QLabel,QTextEdit,QPushButton
 from PyQt5.QtGui import QIcon 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -17,7 +17,7 @@ class Window(QDialog):
         
         self.setWindowTitle("SAJEF-Resultados") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
-        self.showMaximized()
+        #self.showMaximized()
         
         self.mainTeam1 = mainTeam1
         self.mainTeam2 = mainTeam2
@@ -38,35 +38,40 @@ class Window(QDialog):
         self.team1 = team1
         self.team2 = team2
         
-        self.label = QLabel("prueba")
-        self.label2 = QLabel("prueba")
-        # a figure instance to plot on 
+        self.a = QPushButton("Aceptar",self)
+        self.a.clicked.connect(self.accept_button)
+        self.b = QPushButton("cancelar",self)
+        self.b.clicked.connect(self.accept_button1)
+        
+        self.textEdit = QTextEdit("Prueba")
+        self.textEdit.setReadOnly(True)
+        
         self.figure = plt.figure() 
-
-        # this is the Canvas Widget that  
-        # displays the 'figure'it takes the 
-        # 'figure' instance as a parameter to __init__ 
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
-        
-        #ploteamos el grafico
+        #self.plot(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
+        #self.plot2()
+        self.layout = QVBoxLayout()
+ 
+        self.layout.addWidget(self.textEdit)
+        self.layout.addWidget(self.canvas)
+        self.layout.addWidget(self.toolbar)
+
+        self.layout.addWidget(self.a)
+        self.layout.addWidget(self.b)
+
+        self.setLayout(self.layout) 
+   
+    def accept_button(self):
+        self.canvas.figure.clear() #elimia el dibujo anterior para que pueda ser dibujado
         self.plot(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
 
-        # creating a Vertical Box layout 
-        layout = QVBoxLayout() 
- 
-        # adding canvas to the layout 
-        layout.addWidget(self.label)
-        layout.addWidget(self.label2)
-        layout.addWidget(self.canvas)
-        #layout.addWidget(self.canvas2)
-        layout.addWidget(self.toolbar)
- 
-        # setting layout to the main window 
-        self.setLayout(layout) 
-   
-    
+    def accept_button1(self):
+        self.canvas.figure.clear()
+        self.plot2()
+
+        
     def plot(self,team1,team2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2): 
         
         pointsZones1 = (float(pointsOverallDefense1[-1]) + float(pointsOverallMidfield1[-1]) + float(pointsOverallForward1[-1]))
@@ -86,7 +91,7 @@ class Window(QDialog):
         # Names of group
         names = [team1,team2]
         
-        # Create brown bars
+        # Create bars
         p1 = plt.bar(r, bars1, color='r', edgecolor='white', width=0.5)
         p2 = plt.bar(r, bars2, bottom=bars1, color='g', edgecolor='white', width=0.5)
         p3 = plt.bar(r, bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.5)
@@ -97,20 +102,22 @@ class Window(QDialog):
         plt.xticks(r, names, fontweight='bold')
         plt.ylabel('Puntuación')
         
-        #plt.subplot(2, 2, 1)
        
-        self.canvas.draw()
-   
-        # refresh canvas 
         self.canvas.draw() 
+
     def plot2(self):
-        plt.plot([1, 2, 3, 4])
-        #plt.subplot(2, 2, 2)
-        plt.ylabel('some numbers')
-        self.canvas2.draw()
-    
-      
-    
+        t = np.arange(0.0, 2.0, 0.01)
+        s = 1 + np.sin(2*np.pi*t)
+        plt.plot(t, s)
+        
+        plt.xlabel('time (s)')
+        plt.ylabel('voltage (mV)')
+        plt.title('About as simple as it gets, folks')
+        plt.grid(True)
+        
+        
+        self.canvas.draw() 
+
 if __name__ == '__main__':
 
     with open("settings.txt") as fp:
