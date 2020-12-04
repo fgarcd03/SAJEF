@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys 
-from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QLineEdit,QLabel
 from PyQt5.QtGui import QIcon 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -17,6 +17,7 @@ class Window(QDialog):
         
         self.setWindowTitle("SAJEF-Resultados") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
+        self.showMaximized()
         
         self.mainTeam1 = mainTeam1
         self.mainTeam2 = mainTeam2
@@ -37,6 +38,8 @@ class Window(QDialog):
         self.team1 = team1
         self.team2 = team2
         
+        self.label = QLabel("prueba")
+        self.label2 = QLabel("prueba")
         # a figure instance to plot on 
         self.figure = plt.figure() 
 
@@ -46,16 +49,16 @@ class Window(QDialog):
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
-        #self.figure2 = plt.figure() 
-        #self.canvas2 = FigureCanvas(self.figure2)
         
         #ploteamos el grafico
         self.plot(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
-        #self.plot2()
+
         # creating a Vertical Box layout 
         layout = QVBoxLayout() 
  
         # adding canvas to the layout 
+        layout.addWidget(self.label)
+        layout.addWidget(self.label2)
         layout.addWidget(self.canvas)
         #layout.addWidget(self.canvas2)
         layout.addWidget(self.toolbar)
@@ -92,12 +95,11 @@ class Window(QDialog):
         plt.legend((p1[0], p2[0],p3[0],p4[0]), ("Puntos de equipo como conjunto", "Puntos de cada zona del campo(defensa,medio,centro","Puntos de ataque y defensa","Puntos individuales de cada jugador totales")) 
         # Custom X axis
         plt.xticks(r, names, fontweight='bold')
-        plt.xlabel("Equipos")
         plt.ylabel('Puntuación')
         
         #plt.subplot(2, 2, 1)
        
-
+        self.canvas.draw()
    
         # refresh canvas 
         self.canvas.draw() 
