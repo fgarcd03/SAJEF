@@ -11,7 +11,6 @@ import numpy as np
 
 class Window(QDialog): 
        
-    # constructor 
     def __init__(self,mainTeam1,mainTeam2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2,team1,team2,parent=None): 
         super(Window, self).__init__(parent)
         
@@ -43,35 +42,30 @@ class Window(QDialog):
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
         self.zoneGraphic = QRadioButton("Gráfico de zonas(defensa,medio,ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
-        """
-        self.textEdit = QTextEdit("Datos recogidos de los dos equipos:") #hay inconsistencias en la creación de textos, hace lo que le da la gana
-        self.textEdit.append("Primer equipo: {}Segundo equipo: {}.".format(self.team1, self.team2))
+        
+        self.textEdit = QTextEdit("Datos recogidos de los dos equipos.") #hay inconsistencias en la creación de textos, hace lo que le da la gana
+        self.textEdit.append("Primer equipo: {}, segundo equipo: {}.".format(self.team1, self.team2))
         self.textEdit.append("Puntuaciones de equipo como conjunto (30% de la nota):")
-        self.textEdit.append("    -" + self.team1+":{} puntos." + self.team2 +  ":{} puntos. ".format(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3))
+        self.textEdit.append("    -" + self.team1+":{} puntos y " + self.team2 +  ":{} puntos. ".format(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2),round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3,2)))
         self.textEdit.append("Puntuaciones de cada zona del campo(20% de la nota):")
         self.textEdit.append("Puntuaciones de ataque y defensa(30% de la nota):")
-        self.textEdit.append("Puntuaciones de ataque:")
-        self.textEdit.append("equipo1:,equipo2: que en total dan:")
-        self.textEdit.append("Puntuaciones de defensa:")
-        self.textEdit.append("equipo1:,equipo2: que en total dan:")
+        self.textEdit.append("    -Ataque (puntos brutos sin ponderar):" + self.team1 + ":{} puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack1,2),round(self.pointsAttack2,2)))
+        self.textEdit.append("    -Defensa (puntos brutos sin ponderar):" + self.team1 + ":{} puntos y "  + self.team2 + ": {} puntos ".format(round(self.pointsDefense1,2),round(self.pointsDefense2)))
+        self.textEdit.append("    -Que en total de ataque y defensa dan(ponderado):" + self.team1 + ":{} puntos y "  + self.team2 + ": {} puntos.")
         self.textEdit.append("Puntuaciones individuales de cada jugador totales (20% de la nota):")
-        self.textEdit.append("    -" + self.team1+":{} puntos." + self.team2 +  ":{} puntos.".format(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2))
+        self.textEdit.append("    -" + self.team1+":{} puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2),round(((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2),2))
         self.textEdit.append("Nota total:")
-        self.textEdit.append("El equipo tiene una probabilidad de ganar de: % y El equipo tiene una probabilidad de: %")
+        self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de {} y tiene una probabilidad de ganar de:{}% y " + self.team2 + "consigue un total de puntos y tiene una probabilidad de: {}%")
         
         self.textEdit.setReadOnly(True)
-        """
-        self.label1 = QLabel("Primer equipo:" + self.team1 + "Segundo equipo:" + self.team2 +".")
-        self.label2 = QLabel("Puntuaciones de equipo como conjunto (30% de la nota):")
+        
         
         self.figure = plt.figure() 
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
         self.layout = QVBoxLayout()
-        #self.layout.addWidget(self.textEdit)
-        self.layout.addWidget(self.label1)
-        self.layout.addWidget(self.label2)
+        self.layout.addWidget(self.textEdit)
         self.layout.addWidget(self.canvas)
         self.layout.addWidget(self.toolbar)
 
@@ -135,7 +129,15 @@ class Window(QDialog):
         plt.xticks([0,1], [team1,team2], fontweight='bold')
         plt.ylabel('Puntuación')
         
-        self.canvas.draw() 
+        self.canvas.draw()
+        
+    def plotPlayers(self,team1,team2,mainTeam1,mainTeam2):
+        fig = plt.figure()
+        ax = fig.add_axes([0,0,1,1])
+        langs = ['C', 'C++', 'Java', 'Python', 'PHP']
+        students = [23,17,35,29,12]
+        ax.bar(langs,students)
+        self.canvas.draw()
 
 if __name__ == '__main__':
 
@@ -183,8 +185,10 @@ if __name__ == '__main__':
                 pointsDefense2 = float(line)
             elif i == 16:
                 team1 = line
+                team1 = team1[0:-1]
             elif i == 17:
                 team2 = line
+                team2 = team2[0:-1]
       
     # creating apyqt5 application 
     app = QApplication(sys.argv) 
