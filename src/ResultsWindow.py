@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys 
-from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QLineEdit,QLabel,QTextEdit,QPushButton
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QLineEdit,QLabel,QTextEdit,QPushButton,QRadioButton
 from PyQt5.QtGui import QIcon 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -38,41 +38,60 @@ class Window(QDialog):
         self.team1 = team1
         self.team2 = team2
         
-        self.a = QPushButton("Aceptar",self)
-        self.a.clicked.connect(self.accept_button)
-        self.b = QPushButton("cancelar",self)
-        self.b.clicked.connect(self.accept_button1)
+        self.completeGraphic = QRadioButton("Gráfico completo",self)
+        self.completeGraphic.setChecked(True)
+        self.completeGraphic.clicked.connect(self.completeGraphicConnect)
+        self.zoneGraphic = QRadioButton("Gráfico de zonas(defensa,medio,ataque)",self)
+        self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
+        """
+        self.textEdit = QTextEdit("Datos recogidos de los dos equipos:") #hay inconsistencias en la creación de textos, hace lo que le da la gana
+        self.textEdit.append("Primer equipo: {}Segundo equipo: {}.".format(self.team1, self.team2))
+        self.textEdit.append("Puntuaciones de equipo como conjunto (30% de la nota):")
+        self.textEdit.append("    -" + self.team1+":{} puntos." + self.team2 +  ":{} puntos. ".format(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3))
+        self.textEdit.append("Puntuaciones de cada zona del campo(20% de la nota):")
+        self.textEdit.append("Puntuaciones de ataque y defensa(30% de la nota):")
+        self.textEdit.append("Puntuaciones de ataque:")
+        self.textEdit.append("equipo1:,equipo2: que en total dan:")
+        self.textEdit.append("Puntuaciones de defensa:")
+        self.textEdit.append("equipo1:,equipo2: que en total dan:")
+        self.textEdit.append("Puntuaciones individuales de cada jugador totales (20% de la nota):")
+        self.textEdit.append("    -" + self.team1+":{} puntos." + self.team2 +  ":{} puntos.".format(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2))
+        self.textEdit.append("Nota total:")
+        self.textEdit.append("El equipo tiene una probabilidad de ganar de: % y El equipo tiene una probabilidad de: %")
         
-        self.textEdit = QTextEdit("Prueba")
         self.textEdit.setReadOnly(True)
+        """
+        self.label1 = QLabel("Primer equipo:" + self.team1 + "Segundo equipo:" + self.team2 +".")
+        self.label2 = QLabel("Puntuaciones de equipo como conjunto (30% de la nota):")
         
         self.figure = plt.figure() 
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
-        #self.plot(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
-        #self.plot2()
         self.layout = QVBoxLayout()
- 
-        self.layout.addWidget(self.textEdit)
+        #self.layout.addWidget(self.textEdit)
+        self.layout.addWidget(self.label1)
+        self.layout.addWidget(self.label2)
         self.layout.addWidget(self.canvas)
         self.layout.addWidget(self.toolbar)
 
-        self.layout.addWidget(self.a)
-        self.layout.addWidget(self.b)
+        self.layout.addWidget(self.completeGraphic)
+        self.layout.addWidget(self.zoneGraphic)
 
         self.setLayout(self.layout) 
-   
-    def accept_button(self):
-        self.canvas.figure.clear() #elimia el dibujo anterior para que pueda ser dibujado
-        self.plot(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
+        
+        self.completeGraphicConnect() #Dibujamos un gráfico por defecto
+        
+    def completeGraphicConnect(self):
+        self.canvas.figure.clear() #elimia el dibujo anterior para que pueda ser dibujado otro grafico
+        self.plotOverall(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
 
-    def accept_button1(self):
+    def zoneGraphicConnect(self):
         self.canvas.figure.clear()
-        self.plot2()
+        self.plotZones(self.team1,self.team2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2)
 
         
-    def plot(self,team1,team2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2): 
+    def plotOverall(self,team1,team2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2): 
         
         pointsZones1 = (float(pointsOverallDefense1[-1]) + float(pointsOverallMidfield1[-1]) + float(pointsOverallForward1[-1]))
         pointsZones2 = (float(pointsOverallDefense2[-1]) + float(pointsOverallMidfield2[-1])+ float(pointsOverallForward2[-1]))
@@ -86,35 +105,35 @@ class Window(QDialog):
         bars3 = [((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3]
         bars4 = [((pointsVSPlayers1/(pointsVSPlayers1+pointsVSPlayers2)*100))*0.2,((pointsVSPlayers2/(pointsVSPlayers1+pointsVSPlayers2)*100))*0.2]
          
-        # The position of the bars on the x-axis
-        r = [0,1]
-        # Names of group
-        names = [team1,team2]
-        
         # Create bars
-        p1 = plt.bar(r, bars1, color='r', edgecolor='white', width=0.5)
-        p2 = plt.bar(r, bars2, bottom=bars1, color='g', edgecolor='white', width=0.5)
-        p3 = plt.bar(r, bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.5)
-        p4 = plt.bar(r, bars4, bottom=np.array(bars1)+np.array(bars2)+np.array(bars3), color='y', edgecolor='white', width=0.5)
+        p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
+        p2 = plt.bar([0,1], bars2, bottom=bars1, color='g', edgecolor='white', width=0.3)
+        p3 = plt.bar([0,1], bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.3)
+        p4 = plt.bar([0,1], bars4, bottom=np.array(bars1)+np.array(bars2)+np.array(bars3), color='y', edgecolor='white', width=0.3)
         
-        plt.legend((p1[0], p2[0],p3[0],p4[0]), ("Puntos de equipo como conjunto", "Puntos de cada zona del campo(defensa,medio,centro","Puntos de ataque y defensa","Puntos individuales de cada jugador totales")) 
-        # Custom X axis
-        plt.xticks(r, names, fontweight='bold')
+        
+        #Añadir bbox_to_anchor=(0.5, 1.15), ncol=2 al final de legend para que salga fuera del gráfico
+        plt.legend((p1[0], p2[0],p3[0],p4[0]), ("Puntos de equipo como conjunto", "Puntos de cada zona del campo(defensa,medio,centro)","Puntos de ataque y defensa","Puntos individuales de cada jugador totales"),loc="upper center") 
+
+        plt.xticks([0,1], [team1,team2], fontweight='bold')
         plt.ylabel('Puntuación')
         
-       
         self.canvas.draw() 
 
-    def plot2(self):
-        t = np.arange(0.0, 2.0, 0.01)
-        s = 1 + np.sin(2*np.pi*t)
-        plt.plot(t, s)
+    def plotZones(self,team1,team2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2):
+    
+        bars1 = [(float(pointsOverallDefense1[-1])/(float(pointsOverallDefense1[-1])+float(pointsOverallDefense2[-1])))*100,(float(pointsOverallDefense2[-1])/(float(pointsOverallDefense1[-1])+float(pointsOverallDefense2[-1])))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de una  apartado
+        bars2 = [(float(pointsOverallMidfield1[-1])/(float(pointsOverallMidfield1[-1])+float(pointsOverallMidfield2[-1])))*100,(float(pointsOverallMidfield2[-1])/(float(pointsOverallMidfield1[-1])+float(pointsOverallMidfield2[-1])))*100]
+        bars3 = [(float(pointsOverallForward1[-1])/(float(pointsOverallForward1[-1])+float(pointsOverallForward2[-1])))*100,(float(pointsOverallForward2[-1])/(float(pointsOverallForward1[-1])+float(pointsOverallForward2[-1])))*100]
         
-        plt.xlabel('time (s)')
-        plt.ylabel('voltage (mV)')
-        plt.title('About as simple as it gets, folks')
-        plt.grid(True)
+        p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
+        p2 = plt.bar([0,1], bars2, bottom=bars1, color='g', edgecolor='white', width=0.3)
+        p3 = plt.bar([0,1], bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.3)
         
+        plt.legend((p1[0], p2[0],p3[0]), ("Puntos de la zona de defensa", "Puntos de la zona del centro de campo","Puntos de la zona de ataque"),loc="upper center") 
+
+        plt.xticks([0,1], [team1,team2], fontweight='bold')
+        plt.ylabel('Puntuación')
         
         self.canvas.draw() 
 
