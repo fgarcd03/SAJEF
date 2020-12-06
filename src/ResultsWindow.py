@@ -36,6 +36,7 @@ class Window(QDialog):
         self.pointsDefense2 = pointsDefense2
         self.team1 = team1
         self.team2 = team2
+        pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,probabilityWinTeam1,probabilityWinTeam2 = self.additionalCalculations()
         
         self.completeGraphic = QRadioButton("Gráfico completo",self)
         self.completeGraphic.setChecked(True)
@@ -43,19 +44,28 @@ class Window(QDialog):
         self.zoneGraphic = QRadioButton("Gráfico de zonas(defensa,medio,ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
         
-        self.textEdit = QTextEdit("Datos recogidos de los dos equipos.") #hay inconsistencias en la creación de textos, hace lo que le da la gana
-        self.textEdit.append("Primer equipo: {}, segundo equipo: {}.".format(self.team1, self.team2))
-        self.textEdit.append("Puntuaciones de equipo como conjunto (30% de la nota):")
-        self.textEdit.append("    -" + self.team1+":{} puntos y " + self.team2 +  ":{} puntos. ".format(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2),round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3,2)))
-        self.textEdit.append("Puntuaciones de cada zona del campo(20% de la nota):")
-        self.textEdit.append("Puntuaciones de ataque y defensa(30% de la nota):")
-        self.textEdit.append("    -Ataque (puntos brutos sin ponderar):" + self.team1 + ":{} puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack1,2),round(self.pointsAttack2,2)))
-        self.textEdit.append("    -Defensa (puntos brutos sin ponderar):" + self.team1 + ":{} puntos y "  + self.team2 + ": {} puntos ".format(round(self.pointsDefense1,2),round(self.pointsDefense2)))
-        self.textEdit.append("    -Que en total de ataque y defensa dan(ponderado):" + self.team1 + ":{} puntos y "  + self.team2 + ": {} puntos.")
-        self.textEdit.append("Puntuaciones individuales de cada jugador totales (20% de la nota):")
-        self.textEdit.append("    -" + self.team1+":{} puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2),round(((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2),2))
-        self.textEdit.append("Nota total:")
-        self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de {} y tiene una probabilidad de ganar de:{}% y " + self.team2 + "consigue un total de puntos y tiene una probabilidad de: {}%")
+        self.textEdit = QTextEdit("·Datos recogidos de los dos equipos.")
+        self.textEdit.append("·Primer equipo: {}, segundo equipo: {}.".format(self.team1, self.team2))
+        self.textEdit.append("")
+        self.textEdit.append("·Puntuaciones de equipo como conjunto (30% de la nota):")
+        self.textEdit.append("    -" + self.team1+":" + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2))  +" puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2)))
+        self.textEdit.append("")
+        self.textEdit.append("·Puntuaciones de cada zona del campo (20% de la nota):")
+        self.textEdit.append("    -Zona de defensa (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallDefense1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallDefense2[-1]),2)))
+        self.textEdit.append("    -Zona del centro del campo (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallMidfield1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallMidfield2[-1]),2)))
+        self.textEdit.append("    -Zona delantera (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallForward1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallForward2[-1]),2)))
+        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ":" + str(round(((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,2)) +"puntos y " + self.team2 + ":{}  puntos.".format(round(((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2,2)))
+        self.textEdit.append("")
+        self.textEdit.append("·Puntuaciones de ataque y defensa (30% de la nota):" )
+        self.textEdit.append("    -Ataque (puntos brutos sin ponderar):" + self.team1 + ":"+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack2,2)))
+        self.textEdit.append("    -Defensa (puntos brutos sin ponderar):" + self.team1 + ":"+ str(round(self.pointsDefense1,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(self.pointsDefense2,2)))
+        self.textEdit.append("    -Que en total de ataque y defensa dan (ponderado sobre el 30%):" + self.team1 + ":"+ str(round(((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)))
+        self.textEdit.append("")
+        self.textEdit.append("·Puntuaciones individuales de cada jugador totales (20% de la nota):")
+        self.textEdit.append("    -" + self.team1+":"+ str(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)) +" puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)))
+        self.textEdit.append("")
+        self.textEdit.append("·Nota total (100% de la nota):")
+        self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de:"+ str(round(totalTeam1,2)) +" y tiene una probabilidad de ganar de:"+ str(round(probabilityWinTeam1,2)) +"% y " + self.team2 + " consigue un total de puntos de:"+ str(round(totalTeam2,2)) +" y tiene una probabilidad de:"+ str(round(probabilityWinTeam2,2)) +"%.")
         
         self.textEdit.setReadOnly(True)
         
@@ -78,26 +88,21 @@ class Window(QDialog):
         
     def completeGraphicConnect(self):
         self.canvas.figure.clear() #elimia el dibujo anterior para que pueda ser dibujado otro grafico
-        self.plotOverall(self.team1,self.team2,self.pointsVSPlayers1,self.pointsVSPlayers2,self.pointsOverallMainTeam1,self.pointsOverallMainTeam2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2,self.pointsAttack1,self.pointsDefense1,self.pointsAttack2,self.pointsDefense2)
+        self.plotOverall()
 
     def zoneGraphicConnect(self):
         self.canvas.figure.clear()
-        self.plotZones(self.team1,self.team2,self.pointsOverallDefense1,self.pointsOverallMidfield1,self.pointsOverallForward1,self.pointsOverallDefense2,self.pointsOverallMidfield2,self.pointsOverallForward2)
+        self.plotZones()
 
         
-    def plotOverall(self,team1,team2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2): 
-        
-        pointsZones1 = (float(pointsOverallDefense1[-1]) + float(pointsOverallMidfield1[-1]) + float(pointsOverallForward1[-1]))
-        pointsZones2 = (float(pointsOverallDefense2[-1]) + float(pointsOverallMidfield2[-1])+ float(pointsOverallForward2[-1]))
-        
-        pointsAttackDefense1 = pointsAttack1 + pointsDefense1
-        pointsAttackDefense2 = pointsAttack2 + pointsDefense2
+    def plotOverall(self): 
+        pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,probabilityWinTeam1,probabilityWinTeam2 = self.additionalCalculations()
         
         # Values of each group
-        bars1 = [((pointsOverallMainTeam1/(pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3,((pointsOverallMainTeam2/(pointsOverallMainTeam1+pointsOverallMainTeam2))*100)*0.3] #se calcula sobre 100 la puntuación para que no salgan números muy grandes y se multiplica por la ponderancia de cada división
+        bars1 = [((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3] #se calcula sobre 100 la puntuación para que no salgan números muy grandes y se multiplica por la ponderancia de cada división
         bars2 = [((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2]
         bars3 = [((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3]
-        bars4 = [((pointsVSPlayers1/(pointsVSPlayers1+pointsVSPlayers2)*100))*0.2,((pointsVSPlayers2/(pointsVSPlayers1+pointsVSPlayers2)*100))*0.2]
+        bars4 = [((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2]
          
         # Create bars
         p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
@@ -109,16 +114,16 @@ class Window(QDialog):
         #Añadir bbox_to_anchor=(0.5, 1.15), ncol=2 al final de legend para que salga fuera del gráfico
         plt.legend((p1[0], p2[0],p3[0],p4[0]), ("Puntos de equipo como conjunto", "Puntos de cada zona del campo(defensa,medio,centro)","Puntos de ataque y defensa","Puntos individuales de cada jugador totales"),loc="upper center") 
 
-        plt.xticks([0,1], [team1,team2], fontweight='bold')
+        plt.xticks([0,1], [self.team1,self.team2], fontweight='bold')
         plt.ylabel('Puntuación')
         
         self.canvas.draw() 
 
-    def plotZones(self,team1,team2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2):
+    def plotZones(self):
     
-        bars1 = [(float(pointsOverallDefense1[-1])/(float(pointsOverallDefense1[-1])+float(pointsOverallDefense2[-1])))*100,(float(pointsOverallDefense2[-1])/(float(pointsOverallDefense1[-1])+float(pointsOverallDefense2[-1])))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de una  apartado
-        bars2 = [(float(pointsOverallMidfield1[-1])/(float(pointsOverallMidfield1[-1])+float(pointsOverallMidfield2[-1])))*100,(float(pointsOverallMidfield2[-1])/(float(pointsOverallMidfield1[-1])+float(pointsOverallMidfield2[-1])))*100]
-        bars3 = [(float(pointsOverallForward1[-1])/(float(pointsOverallForward1[-1])+float(pointsOverallForward2[-1])))*100,(float(pointsOverallForward2[-1])/(float(pointsOverallForward1[-1])+float(pointsOverallForward2[-1])))*100]
+        bars1 = [(float(self.pointsOverallDefense1[-1])/(float(self.pointsOverallDefense1[-1])+float(self.pointsOverallDefense2[-1])))*100,(float(self.pointsOverallDefense2[-1])/(float(self.pointsOverallDefense1[-1])+float(self.pointsOverallDefense2[-1])))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de una  apartado
+        bars2 = [(float(self.pointsOverallMidfield1[-1])/(float(self.pointsOverallMidfield1[-1])+float(self.pointsOverallMidfield2[-1])))*100,(float(self.pointsOverallMidfield2[-1])/(float(self.pointsOverallMidfield1[-1])+float(self.pointsOverallMidfield2[-1])))*100]
+        bars3 = [(float(self.pointsOverallForward1[-1])/(float(self.pointsOverallForward1[-1])+float(self.pointsOverallForward2[-1])))*100,(float(self.pointsOverallForward2[-1])/(float(self.pointsOverallForward1[-1])+float(self.pointsOverallForward2[-1])))*100]
         
         p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
         p2 = plt.bar([0,1], bars2, bottom=bars1, color='g', edgecolor='white', width=0.3)
@@ -126,12 +131,12 @@ class Window(QDialog):
         
         plt.legend((p1[0], p2[0],p3[0]), ("Puntos de la zona de defensa", "Puntos de la zona del centro de campo","Puntos de la zona de ataque"),loc="upper center") 
 
-        plt.xticks([0,1], [team1,team2], fontweight='bold')
+        plt.xticks([0,1], [self.team1,self.team2], fontweight='bold')
         plt.ylabel('Puntuación')
         
         self.canvas.draw()
         
-    def plotPlayers(self,team1,team2,mainTeam1,mainTeam2):
+    def plotPlayers(self):
         fig = plt.figure()
         ax = fig.add_axes([0,0,1,1])
         langs = ['C', 'C++', 'Java', 'Python', 'PHP']
@@ -139,6 +144,28 @@ class Window(QDialog):
         ax.bar(langs,students)
         self.canvas.draw()
 
+    def additionalCalculations(self):
+        probabilityWinTeam1 = probabilityWinTeam2 = totalTeam1 = totalTeam2 = 0
+        
+        pointsZones1 = (float(self.pointsOverallDefense1[-1]) + float(self.pointsOverallMidfield1[-1]) + float(self.pointsOverallForward1[-1]))
+        pointsZones2 = (float(self.pointsOverallDefense2[-1]) + float(self.pointsOverallMidfield2[-1])+ float(self.pointsOverallForward2[-1]))
+        
+        pointsAttackDefense1 = self.pointsAttack1 + self.pointsDefense1
+        pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
+        
+
+        totalTeam1 = (((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3) + (((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2) + (((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3) + (((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2)
+        totalTeam2 = (((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3) + (((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2) + (((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3) + (((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2)
+        
+        if totalTeam1 > totalTeam2:
+            probabilityWinTeam1 = (totalTeam2/totalTeam1)*100
+            probabilityWinTeam2 = 100 - probabilityWinTeam1
+        else:
+            probabilityWinTeam2 = (totalTeam1/totalTeam2)*100
+            probabilityWinTeam1 = 100 - probabilityWinTeam2
+       
+        return pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,probabilityWinTeam1,probabilityWinTeam2
+    
 if __name__ == '__main__':
 
     with open("settings.txt") as fp:
