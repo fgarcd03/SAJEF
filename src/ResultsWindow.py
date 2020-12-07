@@ -8,6 +8,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt 
 import numpy as np
+import random
+import matplotlib.ticker as mticker
 
 class Window(QDialog): 
        
@@ -43,6 +45,8 @@ class Window(QDialog):
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
         self.zoneGraphic = QRadioButton("Gráfico de zonas(defensa,medio,ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
+        self.playerGraphic = QRadioButton("Gráfico de cada jugador",self)
+        self.playerGraphic.clicked.connect(self.playerGraphicConnect)
         
         self.textEdit = QTextEdit("·Datos recogidos de los dos equipos.")
         self.textEdit.append("·Primer equipo: {}, segundo equipo: {}.".format(self.team1, self.team2))
@@ -81,6 +85,7 @@ class Window(QDialog):
 
         self.layout.addWidget(self.completeGraphic)
         self.layout.addWidget(self.zoneGraphic)
+        self.layout.addWidget(self.playerGraphic)
 
         self.setLayout(self.layout) 
         
@@ -93,7 +98,10 @@ class Window(QDialog):
     def zoneGraphicConnect(self):
         self.canvas.figure.clear()
         self.plotZones()
-
+    
+    def playerGraphicConnect(self):
+        self.canvas.figure.clear()
+        self.plotPlayers()
         
     def plotOverall(self): 
         pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,probabilityWinTeam1,probabilityWinTeam2 = self.additionalCalculations()
@@ -137,11 +145,39 @@ class Window(QDialog):
         self.canvas.draw()
         
     def plotPlayers(self):
-        fig = plt.figure()
-        ax = fig.add_axes([0,0,1,1])
-        langs = ['C', 'C++', 'Java', 'Python', 'PHP']
-        students = [23,17,35,29,12]
-        ax.bar(langs,students)
+        """
+         # random data 
+        data = [random.random() for i in range(10)] 
+   
+        # clearing old figure 
+        #self.figure.clear() 
+   
+        # create an axis 
+        ax = self.figure.add_subplot(111) 
+   
+        # plot data 
+        ax.plot(data, '*-')
+        """
+        
+        data = [[30, 25, 50, 20],
+        [40, 23, 51, 17],
+        [35, 22, 45, 19]]
+        X = np.arange(4)
+        langs = ['C', 'C++', 'Java', 'Python']
+        x = np.arange(len(langs))
+        ax = self.figure.add_axes([0,0,1,1])
+        
+        p1 =ax.bar(X + 0.00, data[0], color = 'b', width = 0.25)
+        p2 =ax.bar(X + 0.25, data[1], color = 'g', width = 0.25)
+        p3 =ax.bar(X + 0.50, data[2], color = 'r', width = 0.25)
+        ind = np.arange(4) 
+        ax.set_xticks(ind)
+        ax.set_xticklabels(['G1', 'G2', 'G3', 'G4'])
+
+        
+        
+        
+        #plt.legend((p1[0], p2[0],p3[0]), ("Puntos de la zona de defensa", "Puntos de la zona del centro de campo","Puntos de la zona de ataque"),loc="upper center") 
         self.canvas.draw()
 
     def additionalCalculations(self):
