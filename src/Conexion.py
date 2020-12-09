@@ -16,12 +16,11 @@ class Neo4j:
             query_result = session.write_transaction(self._return_query,query)
             return query_result
     
-    @staticmethod #Tiene que ser estático no se porque
+    @staticmethod #Tiene que ser estático
     def _return_query(tx,query):
         result_query = tx.run(query)
         
         result = []
         for record in result_query:
-            #result.append(str(record.values())[2: -2: 1]) #Convertimos a cadena los valores y quitamos los corchetes y comillas simples
             result.append(str(record.values()))
-        return  result #result.single()
+        return  result

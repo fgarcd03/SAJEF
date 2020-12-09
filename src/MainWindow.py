@@ -5,12 +5,12 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap,QIcon
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
-import Estimate #archivo donde va el algotirmo de calculo
+import Estimate #archivo donde va el algotirmo de cálculo
 
-class MainWindow(QWidget):#QMainWindow
+class MainWindow(QWidget):
     
     def __init__(self,teams,conexion):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
-        QWidget.__init__(self)#QMainWindow
+        QWidget.__init__(self)
         
         self.teams = teams
         self.conexion = conexion
@@ -58,7 +58,7 @@ class MainWindow(QWidget):#QMainWindow
         
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     mainWin.show()
     sys.exit( app.exec_() )
     
-    conexion.close() #igual hay que moverlo
+    conexion.close()

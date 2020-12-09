@@ -109,7 +109,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
             
-            if(player.split(",")[1] == " LB" or player.split(",")[1] == " LWB" or player.split(",")[1] == " RB" or player.split(",")[1] == " RWB"):#ojo hay que poner el espacio porque es lo que contiene el String
+            if(player.split(",")[1] == " LB" or player.split(",")[1] == " LWB" or player.split(",")[1] == " RB" or player.split(",")[1] == " RWB"):
 
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LBaLWBaRBaRWB' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
