@@ -16,7 +16,7 @@ class Window(QDialog):
         
         self.setWindowTitle("SAJEF-Resultados") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
-        self.setMinimumSize(1000, 600)
+        self.setMinimumSize(1000, 650)
         
         self.mainTeam1 = mainTeam1
         self.mainTeam2 = mainTeam2

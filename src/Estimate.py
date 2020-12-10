@@ -14,8 +14,12 @@ class Estimate:
         mainTeam1 = self.overallCalculation(mainTeam1)
         mainTeam2 = self.overallCalculation(mainTeam2)
 
-        if (len(mainTeam1) or len(mainTeam2)) != 11:
+        if len(mainTeam1) != 11 or len(mainTeam2) != 11:
             print("Error, tamaño de equipo incorrecto")
+            print(mainTeam1)
+            print(mainTeam2)
+            print("Tamaño de equipo 1: " + str(len(mainTeam1)))
+            print("Tamaño de equipo 2: " + str(len(mainTeam2)))
         else:
             #Hacer todo lo demás
             pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(mainTeam1[:],mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaria a esas mismas lista fuera de ella
@@ -95,7 +99,7 @@ class Estimate:
                         overall = overall + (int(statistic)*int(grade))
                 mainTeamReturn.append(player +"," + str(overall))
                 
-            if(player.split(",")[1] == " LCB" or player.split(",")[1] == " RCB"):#ojo hay que poner el espacio porque es lo que contiene el String
+            if(player.split(",")[1] == " LCB" or player.split(",")[1] == " RCB" or player.split(",")[1] == " CB"):#Añadido CB,ojo hay que poner el espacio porque es lo que contiene el String
 
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LCBaRCB' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -123,7 +127,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
             
-            if player.split(",")[1] == " CDM":
+            if player.split(",")[1] == " CDM" or player.split(",")[1] == " RDM" or player.split(",")[1] == " LDM":#Añadidos RDM y LDM
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CDM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -151,7 +155,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
             
-            if(player.split(",")[1] == " LCM" or player.split(",")[1] == " RCM"):
+            if(player.split(",")[1] == " LCM" or player.split(",")[1] == " RCM" or player.split(",")[1] == " LM" or player.split(",")[1] == " RM"):#Añadido LM y RM
 
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LCMaRCM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -165,7 +169,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
             
-            if player.split(",")[1] == " CAM":
+            if player.split(",")[1] == " CAM" or player.split(",")[1] == " LAM" or player.split(",")[1] == " RAM":#Añadidos LAM y RAM
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CAM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -179,7 +183,7 @@ class Estimate:
                 
                 mainTeamReturn.append(player +"," + str(overall))
                 
-            if player.split(",")[1] == " CF":
+            if player.split(",")[1] == " CF" or player.split(",")[1] == " LS" or player.split(",")[1] == " RS":#Añadido LS y RS(no se si está bien)
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CF' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -237,13 +241,13 @@ class Estimate:
         pointsDefense =  pointsMidfield = pointsForward = 0
         
         for player in mainTeam:
-            if player.split(",")[1] == " GK" or player.split(",")[1] == " LB" or player.split(",")[1] == " LWB" or player.split(",")[1] == " LCB" or player.split(",")[1] == " RCB"  or player.split(",")[1] == " RB" or player.split(",")[1] == " RWB":
+            if player.split(",")[1] == " GK" or player.split(",")[1] == " LB" or player.split(",")[1] == " LWB" or player.split(",")[1] == " LCB" or player.split(",")[1] == " RCB"  or player.split(",")[1] == " RB" or player.split(",")[1] == " RWB" or player.split(",")[1] == " CB": #Añadido CB
                 pointsDefense = pointsDefense + int(player.split(",")[2])
                 zoneDefense.append(player)        
-            if player.split(",")[1] == " CDM" or player.split(",")[1] == " CM" or player.split(",")[1] == " LCM" or player.split(",")[1] == " RCM" or player.split(",")[1] == " CAM":
+            if player.split(",")[1] == " CDM" or player.split(",")[1] == " CM" or player.split(",")[1] == " LCM" or player.split(",")[1] == " RCM" or player.split(",")[1] == " CAM" or player.split(",")[1] == " LM" or player.split(",")[1] == " RM" or player.split(",")[1] == " RDM" or player.split(",")[1] == " LDM" or player.split(",")[1] == " LAM" or player.split(",")[1] == " RAM":#Añadido LM y RM, RDM y LDM,LAM y RAM
                 pointsMidfield = pointsMidfield + int(player.split(",")[2])
                 zoneMidfield.append(player)
-            if player.split(",")[1] == " CF" or player.split(",")[1] == " ST" or player.split(",")[1] == " LW" or player.split(",")[1] == " RW":
+            if player.split(",")[1] == " CF" or player.split(",")[1] == " ST" or player.split(",")[1] == " LW" or player.split(",")[1] == " RW" or player.split(",")[1] == " LS" or player.split(",")[1] == " RS": #Añadido LS y RS(no se si esta bien)
                 pointsForward = pointsForward + int(player.split(",")[2])
                 zoneForward.append(player)
         
@@ -296,6 +300,7 @@ class Estimate:
             pointsVS2 = pointsVS2 + int(player2.split(",")[2])
             
         return pointsVS1,pointsVS2
+    
     def filterTeam(self,players):
         mainTeam = []
         
