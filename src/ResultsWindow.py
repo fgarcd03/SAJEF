@@ -70,9 +70,9 @@ class Window(QDialog):
         self.textEdit.append("·Nota total (100% del total):")
         self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de: "+ str(round(totalTeam1,2)) + " y " + self.team2 + " consigue un total de puntos de: " + str(round(totalTeam2,2)) +".")
         if winTeam1 == True:
-            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganas el : " + self.team1 + ".")
+            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganar el : " + self.team1 + ".")
         else:
-            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganas el : " + self.team2 + ".")
+            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganar el : " + self.team2 + ".")
         self.textEdit.setReadOnly(True)
         
         

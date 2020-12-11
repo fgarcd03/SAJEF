@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage
@@ -59,6 +62,7 @@ class MainWindow(QWidget):
 if __name__ == "__main__":
     #Conexión y consulta
     conexion = Conexion.Neo4j("bolt://localhost:11003", "neo4j", "SIBI20")
+    #conexion = Conexion.Neo4j("bolt://35.153.16.53:33608", "neo4j", "aids-utilization-mates")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
