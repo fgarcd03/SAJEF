@@ -188,7 +188,7 @@ class Window(QDialog):
             winTeam1 = True
        
         return pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,winTeam1
-    
+ 
 if __name__ == '__main__':
 
     with open("settings.txt") as fp:
@@ -243,10 +243,10 @@ if __name__ == '__main__':
     # creating apyqt5 application 
     app = QApplication(sys.argv) 
     # creating a window object 
-    main = Window(mainTeam1,mainTeam2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2,team1,team2) 
+    mainWindow = Window(mainTeam1,mainTeam2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2,team1,team2) 
        
     # showing the window 
-    main.show() 
+    mainWindow.show() 
    
     # loop 
     sys.exit(app.exec_()) 
