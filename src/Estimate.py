@@ -16,8 +16,6 @@ class Estimate:
 
         if len(mainTeam1) != 11 or len(mainTeam2) != 11:
             print("Error, tamaño de equipo incorrecto")
-            print(mainTeam1)
-            print(mainTeam2)
             print("Tamaño de equipo 1: " + str(len(mainTeam1)))
             print("Tamaño de equipo 2: " + str(len(mainTeam2)))
         else:
