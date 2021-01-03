@@ -62,7 +62,7 @@ class MainWindow(QWidget):
 if __name__ == "__main__":
     #Conexión y consulta
     #conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
-    conexion = Conexion.Neo4j("bolt://100.25.10.2:34165", "neo4j", "transportation-modules-paws")
+    conexion = Conexion.Neo4j("bolt://100.26.227.192:38377", "neo4j", "motel-umbrella-additions")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
