@@ -41,38 +41,38 @@ class Window(QDialog):
         self.completeGraphic = QRadioButton("Gráfico completo",self)
         self.completeGraphic.setChecked(True)
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
-        self.zoneGraphic = QRadioButton("Gráfico de zonas (defensa,medio,ataque)",self)
+        self.zoneGraphic = QRadioButton("Gráfico de zonas (defensa, medio, ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
         self.playerGraphic = QRadioButton("Gráfico de cada jugador",self)
         self.playerGraphic.clicked.connect(self.playerGraphicConnect)
         
         self.textEdit = QTextEdit("·Datos recogidos de los dos equipos.")
-        self.textEdit.append("·Primer equipo (jugador,posición,puntos individuales): " + self.team1 + " " + str(self.mainTeam1)) 
-        self.textEdit.append("·Segundo equipo (jugador,posición,puntos individuales): " + self.team2 + " " + str(self.mainTeam2))
+        self.textEdit.append("·Primer equipo (jugador, posición, puntos individuales): " + self.team1 + " " + str(self.mainTeam1)) 
+        self.textEdit.append("·Segundo equipo (jugador, posición, puntos individuales): " + self.team2 + " " + str(self.mainTeam2))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total):")
-        self.textEdit.append("    -" + self.team1+":" + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2))  +" puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2)))
+        self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total): ")
+        self.textEdit.append("    -" + self.team1+" :" + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2))  +" puntos y " + self.team2 +  ": {} puntos.".format(round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones de cada zona del campo (20% del total):")
-        self.textEdit.append("    -Zona de defensa (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallDefense1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallDefense2[-1]),2)))
-        self.textEdit.append("    -Zona del centro del campo (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallMidfield1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallMidfield2[-1]),2)))
-        self.textEdit.append("    -Zona delantera (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(float(self.pointsOverallForward1[-1]),2))  +" puntos y " + self.team2 + ":{}  puntos.".format(round(float(self.pointsOverallForward2[-1]),2)))
-        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ":" + str(round(((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,2)) +"puntos y " + self.team2 + ":{}  puntos.".format(round(((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2,2)))
+        self.textEdit.append("·Puntuaciones de cada zona del campo (20% del total): ")
+        self.textEdit.append("    -Zona de defensa (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallDefense1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallDefense2[-1]),2)))
+        self.textEdit.append("    -Zona del centro del campo (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallMidfield1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallMidfield2[-1]),2)))
+        self.textEdit.append("    -Zona delantera (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallForward1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallForward2[-1]),2)))
+        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ": " + str(round(((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,2)) +"puntos y " + self.team2 + ": {}  puntos.".format(round(((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones de ataque y defensa (30% del total):" )
-        self.textEdit.append("    -Ataque (puntos brutos sin ponderar):" + self.team1 + ":"+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack2,2)))
-        self.textEdit.append("    -Defensa (puntos brutos sin ponderar):" + self.team1 + ":"+ str(round(self.pointsDefense1,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(self.pointsDefense2,2)))
-        self.textEdit.append("    -Que en total de ataque y defensa dan (ponderado sobre el 30%):" + self.team1 + ":"+ str(round(((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)))
+        self.textEdit.append("·Puntuaciones de ataque y defensa (30% del total):")
+        self.textEdit.append("    -Ataque (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack2,2)))
+        self.textEdit.append("    -Defensa (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(self.pointsDefense1,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(self.pointsDefense2,2)))
+        self.textEdit.append("    -Que en total de ataque y defensa dan (ponderado sobre el 30%): " + self.team1 + ":"+ str(round(((pointsAttackDefense1/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(((pointsAttackDefense2/(pointsAttackDefense1+pointsAttackDefense2)*100))*0.3,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones individuales de cada jugador totales (20% del total):")
-        self.textEdit.append("    -" + self.team1+":"+ str(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)) +" puntos y " + self.team2 +  ":{} puntos.".format(round(((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)))
+        self.textEdit.append("·Puntuaciones individuales de cada jugador totales (20% del total): ")
+        self.textEdit.append("    -" + self.team1+": "+ str(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)) +" puntos y " + self.team2 +  ": {} puntos.".format(round(((self.pointsVSPlayers2/(self.pointsVSPlayers1+self.pointsVSPlayers2)*100))*0.2,2)))
         self.textEdit.append("")
         self.textEdit.append("·Nota total (100% del total):")
         self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de: "+ str(round(totalTeam1,2)) + " y " + self.team2 + " consigue un total de puntos de: " + str(round(totalTeam2,2)) +".")
         if winTeam1 == True:
-            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganar el : " + self.team1 + ".")
+            self.textEdit.append("    -Por lo tanto al tener más puntos tiene más posibilidad de ganar el " + self.team1 + ".")
         else:
-            self.textEdit.append("    -Por lo tanto al tener mas puntos tiene mas posibilidad de ganar el : " + self.team2 + ".")
+            self.textEdit.append("    -Por lo tanto al tener más puntos tiene más posibilidad de ganar el " + self.team2 + ".")
         self.textEdit.setReadOnly(True)
         
         
@@ -240,14 +240,9 @@ if __name__ == '__main__':
                 team2 = line
                 team2 = team2[0:-1]
       
-    # creating apyqt5 application 
+    #Ventana
     app = QApplication(sys.argv) 
-    # creating a window object 
-    mainWindow = Window(mainTeam1,mainTeam2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2,team1,team2) 
-       
-    # showing the window 
+    mainWindow = Window(mainTeam1,mainTeam2,pointsVSPlayers1,pointsVSPlayers2,pointsOverallMainTeam1,pointsOverallMainTeam2,pointsOverallDefense1,pointsOverallMidfield1,pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2,pointsOverallForward2,pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2,team1,team2)
     mainWindow.show() 
-   
-    # loop 
     sys.exit(app.exec_()) 
   

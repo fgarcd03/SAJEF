@@ -27,7 +27,7 @@ class Estimate:
             pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
             
             
-            file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe
+            file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe y vamos escribiendo todos los datos que hemos recogido
             self.fileWrite(file,mainTeam1)
             self.fileWrite(file,mainTeam2)
             self.fileWrite(file,pointsVSPlayers1)
@@ -60,7 +60,7 @@ class Estimate:
                 file.write("%s;" % item)
             file.write("\n")  
             
-    def createMainTeam(self,conexion,team1,team2):
+    def createMainTeam(self,conexion,team1,team2):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
         players1 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players2 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team2))
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios

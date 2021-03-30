@@ -26,8 +26,8 @@ class MainWindow(QWidget):
         
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
-        self.elegir1 = QLabel("Elija el primer equipo")
-        self.elegir2 = QLabel("Elija el segundo equipo")
+        self.elegir1 = QLabel("Elija su Equipo")
+        self.elegir2 = QLabel("Elija el Equipo Rival")
         self.acept = QPushButton("Aceptar",self)
         self.acept.clicked.connect(self.accept_button) #evento para manejar el click del boton aceptar
         
@@ -61,8 +61,7 @@ class MainWindow(QWidget):
         
 if __name__ == "__main__":
     #Conexión y consulta
-    #conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
-    conexion = Conexion.Neo4j("bolt://100.26.227.192:38377", "neo4j", "motel-umbrella-additions")
+    conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
