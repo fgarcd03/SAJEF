@@ -3,9 +3,9 @@
 
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QVBoxLayout
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap,QIcon
+from PyQt5.QtGui import QIcon
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algotirmo de cálculo
@@ -20,12 +20,13 @@ class MainWindow(QWidget):
         
         self.gridLayout = QGridLayout(self)
         self.setLayout(self.gridLayout)
-        self.setFixedSize(QSize(500, 300))    
+        #self.setFixedSize(QSize(500, 300))    
         self.setWindowTitle("SAJEF") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
         
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
+        self.team2.currentTextChanged.connect(self.on_combobox_changed)
         self.elegir1 = QLabel("Elija su Equipo")
         self.elegir2 = QLabel("Elija el Equipo Rival")
         self.acept = QPushButton("Aceptar",self)
@@ -36,13 +37,8 @@ class MainWindow(QWidget):
         self.gridLayout.addWidget(self.team1,1,0)
         self.gridLayout.addWidget(self.acept,1,1)
         self.gridLayout.addWidget(self.team2,1,2)
-
-        #Parte de la imágen de abajo
-        self.labelImage = QLabel(self)
-        self.pixmap = QPixmap("../resources/ball-soccer-600x400.jpg")
-        self.labelImage.setPixmap(self.pixmap)
-        self.gridLayout.addWidget(self.labelImage,2, 0, 2, 0)
-
+        self.vBoxLayout = QVBoxLayout() #layout para poner los checkboxes de los jugadores para elegir
+        
         self.errorTeam = QErrorMessage()
         self.errorTeam.setFixedSize(250,150)
     
@@ -53,6 +49,33 @@ class MainWindow(QWidget):
             self.team1.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
             self.team2.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
             
+
+        team = str(self.team2.currentText())
+        team = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team))
+        self.checkBoxList = []
+        
+        for player in team:#creamos una lista de comboBoxes de tamaño los jugadores de cada equipo
+            self.checkBox = QCheckBox(player)    
+            self.checkBoxList.append(self.checkBox)
+            self.vBoxLayout.addWidget(self.checkBox,stretch=1) #añadimos las checkboxes al layout
+
+        self.gridLayout.addLayout(self.vBoxLayout,2,1)
+        
+    def on_combobox_changed(self):
+        
+        #eliminamos los widgets antiguos
+        for checkBox in self.checkBoxList:
+            self.vBoxLayout.removeWidget(checkBox)
+        #buscmaos los jugadores del equipo
+        team2 = str(self.team2.currentText())
+        team2 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team2))
+        self.checkBoxList = []
+        #añadimos los jugadores con los checkboxes
+        for player in team2:#creamos una lista de comboBoxes de tamaño los jugadores de cada equipo
+            self.checkBox = QCheckBox(player)    
+            self.checkBoxList.append(self.checkBox)
+            self.vBoxLayout.addWidget(self.checkBox) #añadimos las checkboxes al layout
+    
     def accept_button(self):
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
