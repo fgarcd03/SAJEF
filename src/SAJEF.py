@@ -119,9 +119,8 @@ class MainWindow(QWidget):
     def accept_button(self):
         contador = 0
         for checkBox in self.checkBoxList:#contamos el número de checkboxes marcados
-            if checkBox.isChecked:
+            if checkBox.isChecked():
                 contador = contador + 1
-        print(contador)
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
         elif contador != 11:
@@ -133,7 +132,7 @@ class MainWindow(QWidget):
                 
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
