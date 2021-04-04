@@ -19,7 +19,10 @@ class MainWindow(QWidget):
         
         self.gridLayout = QGridLayout(self)
         self.setLayout(self.gridLayout)
-        self.hBoxSubLayoutDefensa = QHBoxLayout() #en el sublayout metemos el tipo y los jugadores de este tipo   
+        self.hBoxSubLayoutPorteria = QHBoxLayout() #en el sublayout metemos el tipo y los jugadores de este tipo
+        self.hBoxSubLayoutDefensa = QHBoxLayout()
+        self.hBoxSubLayoutCentro = QHBoxLayout()
+        self.hBoxSubLayoutAtaque = QHBoxLayout()
         self.hBoxLayoutPorteria = QHBoxLayout() #en layout horizontal metemos el sublayout para que al meterlo al gridlayout cuente como metemos un solo widget y no 2
         self.hBoxLayoutDefensa = QHBoxLayout()
         self.hBoxLayoutCentro = QHBoxLayout()
@@ -45,11 +48,11 @@ class MainWindow(QWidget):
         self.gridLayout.addWidget(self.team1,1,0)
         self.gridLayout.addWidget(self.acept,1,1)
         self.gridLayout.addWidget(self.team2,1,2)
-        #self.gridLayout.addWidget(self.porteria,2,0)
-        #self.gridLayout.addWidget(self.defensa,3,0)
-        #self.gridLayout.addWidget(self.centro,4,0)
-        #self.gridLayout.addWidget(self.delantera,5,0)
+
+        self.hBoxLayoutPorteria.addWidget(self.porteria)
         self.hBoxLayoutDefensa.addWidget(self.defensa)
+        self.hBoxLayoutCentro.addWidget(self.centro)
+        self.hBoxLayoutAtaque.addWidget(self.delantera)
         
 
         
@@ -80,21 +83,24 @@ class MainWindow(QWidget):
             if(player.split("'")[3] == "GK" or player.split("'")[3] == "SUB,GK" or player.split("'")[3] == "RES,GK"):#dependiendo de lo que sea lo metemos a un layout diferente(la \ sirve para espacar caracteres)
                 self.hBoxLayoutPorteria.addWidget(self.checkBox)#añadimos las checkboxes al layout
                 
-            if(player.split("'")[3] == "CB" or player.split("'")[3] == "SUB,CB" or player.split("'")[3] == "RES,CB" or player.split("'")[3] == "LCB" or player.split("'")[3] == "SUB,LCB" or player.split("'")[3] == "RES,LCB" or player.split("'")[3] == "RCB" or player.split("'")[3] == "SUB,RCB" or player.split("'")[3] == "RES,RCB" or player.split("'")[3] == "LB" or player.split("'")[3] == "SUB,LB" or player.split("'")[3] == "RES,LB"):
+            if(player.split("'")[3] == "CB" or player.split("'")[3] == "SUB,CB" or player.split("'")[3] == "RES,CB" or player.split("'")[3] == "LCB" or player.split("'")[3] == "SUB,LCB" or player.split("'")[3] == "RES,LCB" or player.split("'")[3] == "RCB" or player.split("'")[3] == "SUB,RCB" or player.split("'")[3] == "RES,RCB" or player.split("'")[3] == "LB" or player.split("'")[3] == "SUB,LB" or player.split("'")[3] == "RES,LB" or player.split("'")[3] == "LWB" or player.split("'")[3] == "SUB,LWB" or player.split("'")[3] == "RES,LWB" or player.split("'")[3] == "RB" or player.split("'")[3] == "SUB,RB" or player.split("'")[3] == "RES,RB" or player.split("'")[3] == "RWB" or player.split("'")[3] == "SUB,RWB" or player.split("'")[3] == "RES,RWB"):
                 self.hBoxSubLayoutDefensa.addWidget(self.checkBox)
             
-            if():
+            if(player.split("'")[3] == "CDM" or player.split("'")[3] == "SUB,CDM" or player.split("'")[3] == "RES,CDM" or player.split("'")[3] == "LDM" or player.split("'")[3] == "SUB,LDM" or player.split("'")[3] == "RES,LDM" or player.split("'")[3] == "RDM" or player.split("'")[3] == "SUB,RDM" or player.split("'")[3] == "RES,RDM" or player.split("'")[3] == "CM" or player.split("'")[3] == "SUB,CM" or player.split("'")[3] == "RES,CM" or player.split("'")[3] == "LM" or player.split("'")[3] == "SUB,LM" or player.split("'")[3] == "RES,LM" or player.split("'")[3] == "LCM" or player.split("'")[3] == "SUB,LCM" or player.split("'")[3] == "RES,LCM" or player.split("'")[3] == "RM" or player.split("'")[3] == "SUB,RM" or player.split("'")[3] == "RES,RM" or player.split("'")[3] == "RCM" or player.split("'")[3] == "SUB,RCM" or player.split("'")[3] == "RES,RCM" or player.split("'")[3] == "CAM" or player.split("'")[3] == "SUB,CAM" or player.split("'")[3] == "RES,CAM" or player.split("'")[3] == "LAM" or player.split("'")[3] == "SUB,LAM" or player.split("'")[3] == "RES,LAM" or player.split("'")[3] == "RAM" or player.split("'")[3] == "SUB,RAM" or player.split("'")[3] == "RES,RAM"):
                 self.hBoxLayoutCentro.addWidget(self.checkBox)
             
-            if():
+            if(player.split("'")[3] == "CF" or player.split("'")[3] == "SUB,CF" or player.split("'")[3] == "RES,CF" or player.split("'")[3] == "LS" or player.split("'")[3] == "SUB,LS" or player.split("'")[3] == "RES,LS" or player.split("'")[3] == "RS" or player.split("'")[3] == "SUB,RS" or player.split("'")[3] == "RES,RS" or player.split("'")[3] == "ST" or player.split("'")[3] == "SUB,ST" or player.split("'")[3] == "RES,ST" or player.split("'")[3] == "LW" or player.split("'")[3] == "SUB,LW" or player.split("'")[3] == "RES,LW" or player.split("'")[3] == "RW" or player.split("'")[3] == "SUB,RW" or player.split("'")[3] == "RES,RW"):
                 self.hBoxLayoutAtaque.addWidget(self.checkBox)
-                
+        
+        self.hBoxLayoutPorteria.addLayout(self.hBoxSubLayoutPorteria)
+        self.gridLayout.addLayout(self.hBoxLayoutPorteria,2,0,1,3) #el tercer número indica el número de filas que quiero juntar y el cuarto el número de columnas        
         self.hBoxLayoutDefensa.addLayout(self.hBoxSubLayoutDefensa)
-        self.gridLayout.addLayout(self.hBoxLayoutDefensa,2,0,1,3)
-        #self.gridLayout.addLayout(self.hBoxLayoutPorteria,2,1,1,2) #el tercer número indica el número de filas que quiero juntar y el cuarto el número de columnas
-        #self.gridLayout.addLayout(self.hBoxLayoutDefensa,3,1,1,2)
-        #self.gridLayout.addLayout(self.hBoxLayoutCentro,4,1,1,2)
-        #self.gridLayout.addLayout(self.hBoxLayoutAtaque,5,1,1,2)
+        self.gridLayout.addLayout(self.hBoxLayoutDefensa,3,0,1,3)
+        self.hBoxLayoutCentro.addLayout(self.hBoxSubLayoutCentro)
+        self.gridLayout.addLayout(self.hBoxLayoutCentro,4,0,1,3)
+        self.hBoxLayoutAtaque.addLayout(self.hBoxSubLayoutAtaque)
+        self.gridLayout.addLayout(self.hBoxLayoutAtaque,5,0,1,3)
+
     def accept_button(self):
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
