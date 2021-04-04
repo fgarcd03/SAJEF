@@ -3,8 +3,9 @@
 
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QHBoxLayout
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QHBoxLayout,QScrollBar
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import * #para el QT.Horizontal
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algotirmo de cálculo
@@ -27,6 +28,12 @@ class MainWindow(QWidget):
         self.hBoxLayoutDefensa = QHBoxLayout()
         self.hBoxLayoutCentro = QHBoxLayout()
         self.hBoxLayoutAtaque = QHBoxLayout()
+        
+        """
+        self.s1 = QScrollBar()
+        self.s1.setOrientation(Qt.Horizontal)
+        self.hBoxLayoutAtaque.addWidget(self.s1)
+        """
 
         self.setWindowTitle("SAJEF") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
@@ -40,25 +47,25 @@ class MainWindow(QWidget):
         self.defensa = QLabel("Defensa")
         self.centro = QLabel("Centro del Campo")
         self.delantera = QLabel("Ataque")
-        self.acept = QPushButton("Aceptar",self)
+        self.acept = QPushButton("Aceptar")
+        self.defaultTeam = QPushButton("Equipo por Defecto")
         self.acept.clicked.connect(self.accept_button) #evento para manejar el click del boton aceptar
+        self.defaultTeam.clicked.connect(self.defaultTeam_button)
         
         self.gridLayout.addWidget(self.choose1,0,0)
         self.gridLayout.addWidget(self.choose2,0,2)
         self.gridLayout.addWidget(self.team1,1,0)
-        self.gridLayout.addWidget(self.acept,1,1)
+        self.gridLayout.addWidget(self.acept,0,1)
         self.gridLayout.addWidget(self.team2,1,2)
+        self.gridLayout.addWidget(self.defaultTeam,1,1)
 
         self.hBoxLayoutPorteria.addWidget(self.porteria)
         self.hBoxLayoutDefensa.addWidget(self.defensa)
         self.hBoxLayoutCentro.addWidget(self.centro)
         self.hBoxLayoutAtaque.addWidget(self.delantera)
         
-
-        
         self.errorTeam = QErrorMessage()
         self.errorTeam.setFixedSize(250,150)
-    
         
         for index,item in enumerate(teams):
             self.team1.addItem(item[2:-2])     
@@ -100,16 +107,33 @@ class MainWindow(QWidget):
         self.gridLayout.addLayout(self.hBoxLayoutCentro,4,0,1,3)
         self.hBoxLayoutAtaque.addLayout(self.hBoxSubLayoutAtaque)
         self.gridLayout.addLayout(self.hBoxLayoutAtaque,5,0,1,3)
+        
 
+    def defaultTeam_button(self):
+        for checkBox in self.checkBoxList:#si es un jugador titular, lo marcamos, y si no lo demascarcamos
+            if "SUB" in checkBox.text() or "RES" in checkBox.text():
+                checkBox.setChecked(False) #NO TESTEADO
+            else:
+                checkBox.setChecked(True)
+                
     def accept_button(self):
+        contador = 0
+        for checkBox in self.checkBoxList:#contamos el número de checkboxes marcados
+            if checkBox.isChecked:
+                contador = contador + 1
+        print(contador)
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
+        elif contador != 11:
+            self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText())) #creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
-        
+    
+    
+                
 if __name__ == "__main__":
     #Conexión y consulta
-    conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
+    conexion = Conexion.Neo4j("bolt://localhost:11006", "neo4j", "SIBI20")
     teams = conexion.query("MATCH (p)-[r:PLAYS]->(c) RETURN DISTINCT c.id")
     
     #Ventana
