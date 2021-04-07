@@ -3,17 +3,18 @@
 
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QHBoxLayout,QScrollBar
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QHBoxLayout,QScrollBar,QScrollArea,QWidget,QFormLayout,QScroller,QApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import * #para el QT.Horizontal
+from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algotirmo de cálculo
 
 class MainWindow(QWidget):
     
-    def __init__(self,teams,conexion):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
-        QWidget.__init__(self)
+    def __init__(self,teams,conexion,parent=None):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
+        super().__init__(parent)
+        #self.widget = QWidget()#para el scroll
         self.checkBoxList = [] #lista de checkboxes de los jugadores
         self.teams = teams
         self.conexion = conexion
@@ -29,14 +30,25 @@ class MainWindow(QWidget):
         self.hBoxLayoutCentro = QHBoxLayout()
         self.hBoxLayoutAtaque = QHBoxLayout()
         
-        """
-        self.s1 = QScrollBar()
-        self.s1.setOrientation(Qt.Horizontal)
-        self.hBoxLayoutAtaque.addWidget(self.s1)
-        """
+       
+        self.scroll_area = QScrollArea()
+        self.gridLayout.addWidget(self.scroll_area,2,0,4,3)
+        self.scroll_widget = QWidget()
+        self.scroll_layout = QFormLayout(self.scroll_widget)
+        self.scroll_layout.addRow(self.gridLayout)
+        self.scroll_area.setWidget(self.scroll_widget)
 
+        
+        """
+        
+        
+        self.centralwid = QScrollArea()
+        #self.centralwid.setOrientation(Qt.Horizontal())
+        self.hBoxLayoutAtaque.add(self.hBoxLayoutAtaque)
+        """
         self.setWindowTitle("SAJEF") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
+        self.setFixedSize(500, 500)
         
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
@@ -65,7 +77,6 @@ class MainWindow(QWidget):
         self.hBoxLayoutAtaque.addWidget(self.delantera)
         
         self.errorTeam = QErrorMessage()
-        self.errorTeam.setFixedSize(250,150)
         
         for index,item in enumerate(teams):
             self.team1.addItem(item[2:-2])     
