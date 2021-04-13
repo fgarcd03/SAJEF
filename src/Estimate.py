@@ -4,32 +4,34 @@ import os
 
 class Estimate:
     
-    def __init__(self,conexion,team1,team2):
+    def __init__(self,conexion,team1,team2,mainTeam2):
         self.conexion = conexion
         self.team1 = team1
         self.team2 = team2
-     
-        mainTeam1,mainTeam2 = self.createMainTeam(self.conexion,self.team1,self.team2)
+        self.mainTeam2 = mainTeam2
+        
+        self.createMainTeam1()#El equipo 2 no creamos mainTeam porque ya lo hace el usuario
 
-        mainTeam1 = self.overallCalculation(mainTeam1)
-        mainTeam2 = self.overallCalculation(mainTeam2)
+        self.mainTeam1 = self.overallCalculation(self.mainTeam1)
+        self.mainTeam2 = self.overallCalculation(self.mainTeam2)
 
-        if len(mainTeam1) != 11 or len(mainTeam2) != 11:
+        if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
             print("Error, tamaño de equipo incorrecto")
-            print("Tamaño de equipo 1: " + str(len(mainTeam1)))
-            print("Tamaño de equipo 2: " + str(len(mainTeam2)))
+            print("Tamaño de equipo 1: " + str(len(self.mainTeam1)))
+            print("Tamaño de equipo 2: " + str(len(self.mainTeam2)))
         else:
             #Hacer todo lo demás
-            pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(mainTeam1[:],mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaria a esas mismas lista fuera de ella
-            pointsOverallMainTeam1,pointsOverallMainTeam2 = self.overallMainTeam(mainTeam1,mainTeam2)
-            pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(mainTeam1)
-            pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(mainTeam2)
+            pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(self.mainTeam1[:],self.mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaria a esas mismas lista fuera de ella
+            pointsOverallMainTeam1,pointsOverallMainTeam2 = self.overallMainTeam()
+            pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(self.mainTeam1)
+            pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(self.mainTeam2)
             pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
             
             
             file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe y vamos escribiendo todos los datos que hemos recogido
-            self.fileWrite(file,mainTeam1)
-            self.fileWrite(file,mainTeam2)
+            
+            self.fileWrite(file,self.mainTeam1)
+            self.fileWrite(file,self.mainTeam2)
             self.fileWrite(file,pointsVSPlayers1)
             self.fileWrite(file,pointsVSPlayer2)
             self.fileWrite(file,pointsOverallMainTeam1)
@@ -47,7 +49,6 @@ class Estimate:
             self.fileWrite(file,team1)
             self.fileWrite(file,team2)
 
-            
             file.close()
             
             os.system("python3 ResultsWindow.py &")
@@ -60,17 +61,13 @@ class Estimate:
                 file.write("%s;" % item)
             file.write("\n")  
             
-    def createMainTeam(self,conexion,team1,team2):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
-        players1 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
-        players2 = conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=team2))
+    def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
+        players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
         players1 = [player[1:-1] for player in players1]
-        players2 = [player.replace("'", "") for player in players2]
-        players2= [player[1:-1] for player in players2]
 
-        mainTeam1 = self.filterTeam(players1)
-        mainTeam2 = self.filterTeam(players2)
-        return mainTeam1,mainTeam2
+        self.mainTeam1 = self.filterTeam(players1)
+
         
     def overallCalculation(self,mainTeam):#aquí calculamos los puntos totales de cada jugador en el enfrentamiento
         mainTeamReturn = [] #hacemos una nueva lista para meter los jugadores con el overall
@@ -224,9 +221,9 @@ class Estimate:
                 
         return mainTeamReturn
                         
-    def overallMainTeam(self,mainTeam1,mainTeam2):
+    def overallMainTeam(self):
         points1 = points2 = 0
-        for player1,player2 in zip(mainTeam1,mainTeam2):
+        for player1,player2 in zip(self.mainTeam1,self.mainTeam2):
             points1 = points1 + int(player1.split(",")[2])
             points2 = points2 + int(player2.split(",")[2])
         return points1,points2

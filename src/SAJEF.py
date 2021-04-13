@@ -3,7 +3,7 @@
 
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QCheckBox,QHBoxLayout,QScrollBar,QScrollArea,QWidget,QFormLayout,QScroller,QApplication,QListWidget,QVBoxLayout
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
