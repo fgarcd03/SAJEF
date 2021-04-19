@@ -14,9 +14,10 @@ class MainWindow(QWidget):
     
     def __init__(self,teams,conexion,parent=None):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
         super().__init__(parent)
-
         self.teams = teams
         self.conexion = conexion
+        
+        self.mainTeam2 = [] #El eqipo que creará el usuario
         
         self.setWindowTitle("SAJEF") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
@@ -94,13 +95,13 @@ class MainWindow(QWidget):
             itemPlayer = QtWidgets.QListWidgetItem(player[2:-2].replace("'",""))#creamos un item con el jugador
             itemPlayer.setFlags(itemPlayer.flags() | Qt.ItemIsUserCheckable)
             itemPlayer.setCheckState(Qt.Unchecked) #ponemos la checkbox a desactivado
-            if(player.split("'")[3] == "GK" or player.split("'")[3] == "SUB,GK" or player.split("'")[3] == "RES,GK"):#dependiendo de lo que sea lo metemos a un layout diferente(la \ sirve para espacar caracteres)
+            if "GK" in player:#dependiendo de lo que sea lo metemos a un layout diferente, si es GK o SUB-GK o RES-GK lo añade
                 self.listItemPorteria.addItem(itemPlayer) #y añadimos el item a la lista de Items
-            if(player.split("'")[3] == "CB" or player.split("'")[3] == "SUB,CB" or player.split("'")[3] == "RES,CB" or player.split("'")[3] == "LCB" or player.split("'")[3] == "SUB,LCB" or player.split("'")[3] == "RES,LCB" or player.split("'")[3] == "RCB" or player.split("'")[3] == "SUB,RCB" or player.split("'")[3] == "RES,RCB" or player.split("'")[3] == "LB" or player.split("'")[3] == "SUB,LB" or player.split("'")[3] == "RES,LB" or player.split("'")[3] == "LWB" or player.split("'")[3] == "SUB,LWB" or player.split("'")[3] == "RES,LWB" or player.split("'")[3] == "RB" or player.split("'")[3] == "SUB,RB" or player.split("'")[3] == "RES,RB" or player.split("'")[3] == "RWB" or player.split("'")[3] == "SUB,RWB" or player.split("'")[3] == "RES,RWB"):
+            if "CB" in player or "LCB" in player or "RCB" in player or "LB" in player or "LWB" in player or "RB" in player or "RWB" in player:
                 self.listItemDefensa.addItem(itemPlayer)   
-            if(player.split("'")[3] == "CDM" or player.split("'")[3] == "SUB,CDM" or player.split("'")[3] == "RES,CDM" or player.split("'")[3] == "LDM" or player.split("'")[3] == "SUB,LDM" or player.split("'")[3] == "RES,LDM" or player.split("'")[3] == "RDM" or player.split("'")[3] == "SUB,RDM" or player.split("'")[3] == "RES,RDM" or player.split("'")[3] == "CM" or player.split("'")[3] == "SUB,CM" or player.split("'")[3] == "RES,CM" or player.split("'")[3] == "LM" or player.split("'")[3] == "SUB,LM" or player.split("'")[3] == "RES,LM" or player.split("'")[3] == "LCM" or player.split("'")[3] == "SUB,LCM" or player.split("'")[3] == "RES,LCM" or player.split("'")[3] == "RM" or player.split("'")[3] == "SUB,RM" or player.split("'")[3] == "RES,RM" or player.split("'")[3] == "RCM" or player.split("'")[3] == "SUB,RCM" or player.split("'")[3] == "RES,RCM" or player.split("'")[3] == "CAM" or player.split("'")[3] == "SUB,CAM" or player.split("'")[3] == "RES,CAM" or player.split("'")[3] == "LAM" or player.split("'")[3] == "SUB,LAM" or player.split("'")[3] == "RES,LAM" or player.split("'")[3] == "RAM" or player.split("'")[3] == "SUB,RAM" or player.split("'")[3] == "RES,RAM"):
+            if "CDM" in player or "LDM" in player or "RDM" in player or "CM" in player or "LM" in player or "LCM" in player or "RM" in player or "RCM" in player or "CAM" in player or "LAM" in player or "RAM" in player:
                 self.listItemCentro.addItem(itemPlayer)
-            if(player.split("'")[3] == "CF" or player.split("'")[3] == "SUB,CF" or player.split("'")[3] == "RES,CF" or player.split("'")[3] == "LS" or player.split("'")[3] == "SUB,LS" or player.split("'")[3] == "RES,LS" or player.split("'")[3] == "RS" or player.split("'")[3] == "SUB,RS" or player.split("'")[3] == "RES,RS" or player.split("'")[3] == "ST" or player.split("'")[3] == "SUB,ST" or player.split("'")[3] == "RES,ST" or player.split("'")[3] == "LW" or player.split("'")[3] == "SUB,LW" or player.split("'")[3] == "RES,LW" or player.split("'")[3] == "RW" or player.split("'")[3] == "SUB,RW" or player.split("'")[3] == "RES,RW"):
+            if "CF" in player or "LS" in player or "RS" in player or "ST" in player or "LW" in player or "RW" in player:
                 self.listItemAtaque.addItem(itemPlayer)
 
     def defaultTeam_button(self):
@@ -129,26 +130,31 @@ class MainWindow(QWidget):
                 self.listItemAtaque.item(index).setCheckState(Qt.Checked)
                 
     def accept_button(self):
+        self.mainTeam2.clear()
         counter = 0
         for index in range(self.listItemPorteria.count()):
             if self.listItemPorteria.item(index).checkState() == Qt.Checked:
+                self.mainTeam2.append(self.listItemPorteria.item(index).text())
                 counter = counter + 1
         for index in range(self.listItemDefensa.count()):
             if self.listItemDefensa.item(index).checkState() == Qt.Checked:
+                self.mainTeam2.append(self.listItemDefensa.item(index).text())
                 counter = counter + 1
         for index in range(self.listItemCentro.count()):
             if self.listItemCentro.item(index).checkState() == Qt.Checked:
+                self.mainTeam2.append(self.listItemCentro.item(index).text())
                 counter = counter + 1
         for index in range(self.listItemAtaque.count()):
             if self.listItemAtaque.item(index).checkState() == Qt.Checked:
+                self.mainTeam2.append(self.listItemAtaque.item(index).text())
                 counter = counter + 1
                 
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
         elif counter != 11:
             self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
-        else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan
-            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText())) #creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
+        else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan  
+            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
     
                 
 if __name__ == "__main__":
