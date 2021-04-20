@@ -18,8 +18,6 @@ class Estimate:
         
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
             print("Error, tamaño de equipo incorrecto")
-            print(self.mainTeam1)
-            print(self.mainTeam2)
             print("Tamaño de equipo 1: " + str(len(self.mainTeam1)))
             print("Tamaño de equipo 2: " + str(len(self.mainTeam2)))
         else:
@@ -139,7 +137,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
             
-            if "CM" in player:
+            if "CM" in player and "LCM" not in player and "RCM" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -166,8 +164,7 @@ class Estimate:
                     overall = overall + (int(statistic)*int(grade))
                     
                 mainTeamReturn.append(player +"," + str(overall))
-            
-                print(player)
+    
             if "CAM" in player or "LAM" in player or "RAM" in player:
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
@@ -210,7 +207,7 @@ class Estimate:
                     
                 mainTeamReturn.append(player +"," + str(overall))
                     
-            if "LW" in player or "RW" in player:
+            if "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
                
                 statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
                 grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LWaRW' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
@@ -223,7 +220,7 @@ class Estimate:
                     overall = overall + (int(statistic)*int(grade))
                     
                 mainTeamReturn.append(player +"," + str(overall))
-                
+            
         return mainTeamReturn
                         
     def overallMainTeam(self):
@@ -246,7 +243,7 @@ class Estimate:
             if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
                 pointsMidfield = pointsMidfield + int(player.split(",")[2])
                 zoneMidfield.append(player)
-            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player:
+            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
                 pointsForward = pointsForward + int(player.split(",")[2])
                 zoneForward.append(player)
         

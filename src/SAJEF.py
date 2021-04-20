@@ -101,7 +101,7 @@ class MainWindow(QWidget):
                 self.listItemDefensa.addItem(itemPlayer)   
             if "CDM" in player or "LDM" in player or "RDM" in player or "CM" in player or "LM" in player or "LCM" in player or "RM" in player or "RCM" in player or "CAM" in player or "LAM" in player or "RAM" in player:
                 self.listItemCentro.addItem(itemPlayer)
-            if "CF" in player or "LS" in player or "RS" in player or "ST" in player or "LW" in player or "RW" in player:
+            if "CF" in player or "LS" in player or "RS" in player or "ST" in player or "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player: #los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
                 self.listItemAtaque.addItem(itemPlayer)
 
     def defaultTeam_button(self):
