@@ -128,7 +128,54 @@ class MainWindow(QWidget):
                 self.listItemAtaque.item(index).setCheckState(Qt.Unchecked)
             else:
                 self.listItemAtaque.item(index).setCheckState(Qt.Checked)
+    
+    def checkRepeatedPositions(self):#comprobamos si hay más jugadores que posiciones disponibles, por ejemplo que no haya mas de 3 centrales
+        counterGK = counterCM = counterST = False
+        counterCB = counterLRB = counterCDM = counterLRM = counterCAM = counterCF = counterLRW = 0
+        for player in self.mainTeam2:
+            if "GK" in player:
+                if counterGK:
+                    return True
+                counterGK = True
+            if "CB" in player or "RCB" in player or "LCB" in player:
+                counterCB = counterCB + 1
+                if counterCB > 3: #si hay mas de 3 centrales damos error
+                    return True
+            if "LB" in player or "LWB" in player or "RB" in player or "RWB" in player:
+                counterLRB = counterLRB + 1
+                if counterLRB > 4:
+                    return True
+            if "CDM" in player or "LDM" in player or "RDM" in player:
+                counterCDM = counterCDM + 1
+                if counterCDM > 3:
+                    return True
+            if "CM" in player and "LCM" not in player and "RCM" not in player:
+                if counterCM:
+                    return True
+                counterCM = True  
+            if "LM" in player or "LCM" in player or "RM" in player or "RCM" in player:
+                counterLRM = counterLRM + 1
+                if counterLRM > 4:
+                    return True
+            if "CAM" in player or "LAM" in player or "RAM" in player:
+                counterCAM = counterCAM + 1
+                if counterCAM > 3:
+                    return True
+            if "CF" in player or "LS" in player or "RS" in player:
+                counterCF = counterCF + 1
+                if counterCF > 3:
+                    return True
+            if "ST" in player:
+                if counterST:
+                    return True
+                counterST = True
+            if "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player:
+                counterLRW = counterLRW + 1
+                if counterLRW > 2:
+                    return True           
                 
+        return False        
+    
     def accept_button(self):
         self.mainTeam2.clear()
         counter = 0
@@ -153,6 +200,8 @@ class MainWindow(QWidget):
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
         elif counter != 11:
             self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
+        elif self.checkRepeatedPositions() == True:
+            self.errorTeam.showMessage("Hay demasiados jugadores en una misma posición, revise de nuevo.")
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan  
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
     
