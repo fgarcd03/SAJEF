@@ -17,6 +17,7 @@ class Estimate:
         
         
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
+
             print("Error, tamaño de equipo incorrecto")
             print("Tamaño de equipo 1: " + str(len(self.mainTeam1)))
             print("Tamaño de equipo 2: " + str(len(self.mainTeam2)))
@@ -73,155 +74,62 @@ class Estimate:
     def overallCalculation(self,mainTeam):#aquí calculamos los puntos totales de cada jugador en el enfrentamiento
         mainTeamReturn = [] #hacemos una nueva lista para meter los jugadores con el overall
         for player in mainTeam:
-            statistics = grades = overall = 0
-            
+    
             if "GK" in player:
+                self.overallCalculationAux(mainTeamReturn, "GK", player)
 
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.height_cm,p.gkDiving,p.gkHandling,p.gkKicking,p.gkReflexes,p.gkSpeed,p.gkPositioning,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityComposure,p.mentalityVision,p.attackingVolleys,p.movementAgility,p.movementReactions,p.mentalityInterceptions".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='GK' RETURN p.height_cm,p.gkDiving,p.gkHandling,p.gkKicking,p.gkReflexes,p.gkSpeed,p.gkPositioning,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityComposure,p.mentalityVision,p.attackingVolleys,p.movementAgility,p.movementReactions,p.mentalityInterceptions")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-
-                height = False
-                for statistic,grade in zip(statistics,grades):
-                    if height == False:
-                        height = True
-                        if int(float(statistic)) > 180 and int(float(statistic)) < 190: # si la altura del portero esta entre 1,8 y 1,9 m lo contamos para el overall
-                            overall = int(float(statistic))*int(float(grade))
-                    else:
-                        
-                        overall = overall + (int(statistic)*int(grade))
-                mainTeamReturn.append(player +"," + str(overall))
-                
             if "LCB" in player or "RCB" in player or "CB" in player:
+                self.overallCalculationAux(mainTeamReturn, "CBaLCBaRCB", player)
 
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CBaLCBaRCB' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
-            
             if "LB" in player or "LWB" in player or "RB" in player or "RWB" in player:
-
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LBaLWBaRBaRWB' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
+                self.overallCalculationAux(mainTeamReturn, "LBaLWBaRBaRWB", player)
             
             if "CDM" in player or "RDM" in player or "LDM" in player:
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CDMaLDMaRDM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
-            
+                self.overallCalculationAux(mainTeamReturn, "CDMaLDMaRDM", player)
+        
             if "CM" in player and "LCM" not in player and "RCM" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
-            
+                self.overallCalculationAux(mainTeamReturn, "CM", player)
+        
             if "LCM" in player or "RCM" in player or "LM" in player or "RM" in player:
-
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LMaLCMaRMaRCM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
+                self.overallCalculationAux(mainTeamReturn, "LMaLCMaRMaRCM", player)
     
             if "CAM" in player or "LAM" in player or "RAM" in player:
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CAMaLAMaRAM' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                
-                mainTeamReturn.append(player +"," + str(overall))
+                self.overallCalculationAux(mainTeamReturn, "CAMaLAMaRAM", player)
                 
             if "CF" in player or "LS" in player or "RS" in player:
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='CFaLSaRS' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
+                self.overallCalculationAux(mainTeamReturn, "CFaLSaRS", player)
                 
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
-            
             if "ST" in player:
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='ST' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
+                self.overallCalculationAux(mainTeamReturn, "ST", player)
                     
             if "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
-               
-                statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=(player.split(",")[0])))
-                grades = self.conexion.query("MATCH (p:Position) WHERE p.id='LWaRW' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle")
-                statistics = statistics[0].replace(",","")[1:-1]
-                statistics = statistics.split(" ")
-                grades = grades[0].replace(",","")[1:-1]
-                grades = grades.split(" ")
-                
-                for statistic,grade in zip(statistics,grades):
-                    overall = overall + (int(statistic)*int(grade))
-                    
-                mainTeamReturn.append(player +"," + str(overall))
+                self.overallCalculationAux(mainTeamReturn, "LWaRW", player)
             
         return mainTeamReturn
+    
+    def overallCalculationAux(self,mainTeamReturn,pid,player):#le pasamos la lista,p.id de la base de datos y el jugador de la base de datos
+        statistics = grades = overall = 0
+        
+        if pid == "GK": #Si es portero tenemos que buscar de otras estadísticas
+            statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.height_cm,p.gkDiving,p.gkHandling,p.gkKicking,p.gkReflexes,p.gkSpeed,p.gkPositioning,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityComposure,p.mentalityVision,p.attackingVolleys,p.movementAgility,p.movementReactions,p.mentalityInterceptions".format(player1=player.split(",")[0]))
+            grades = self.conexion.query("MATCH (p:Position) WHERE p.id='GK' RETURN p.height_cm,p.gkDiving,p.gkHandling,p.gkKicking,p.gkReflexes,p.gkSpeed,p.gkPositioning,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityComposure,p.mentalityVision,p.attackingVolleys,p.movementAgility,p.movementReactions,p.mentalityInterceptions")
+        else:
+            statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=player.split(",")[0]))
+            grades = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=pid))
+        
+        statistics = statistics[0].replace(",","")[1:-1]
+        statistics = statistics.split(" ")
+        grades = grades[0].replace(",","")[1:-1]
+        grades = grades.split(" ")
+        
+        for statistic,grade in zip(statistics,grades):
+            if "." in statistic:#si existe un . en el string de la estadistica es que es float y estamos que estamos en la altura del portero y hay que tenerla en cuenta aparte   
+                overall = overall + int(float(statistic))*int(float(grade))
+            else:
+                overall = overall + (int(statistic)*int(grade))
+            
+        mainTeamReturn.append(player +"," + str(overall))
+        #no hace falta devolver la lista porque no se pasa como copia
                         
     def overallMainTeam(self):
         points1 = points2 = 0
