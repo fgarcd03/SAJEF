@@ -14,8 +14,8 @@ class Estimate:
 
         self.mainTeam1 = self.overallCalculation(self.mainTeam1)
         self.mainTeam2 = self.overallCalculation(self.mainTeam2)
-        
-        
+
+
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
 
             print("Error, tamaño de equipo incorrecto")

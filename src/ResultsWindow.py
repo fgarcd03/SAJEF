@@ -47,8 +47,8 @@ class Window(QDialog):
         self.playerGraphic.clicked.connect(self.playerGraphicConnect)
         
         self.textEdit = QTextEdit("·Datos recogidos de los dos equipos.")
-        self.textEdit.append("·Primer equipo (jugador, posición, puntos individuales): " + self.team1 + " " + str(self.mainTeam1)) 
-        self.textEdit.append("·Segundo equipo (jugador, posición, puntos individuales): " + self.team2 + " " + str(self.mainTeam2))
+        self.textEdit.append(" ".join(("·Primer equipo (jugador, posición, puntos individuales): " + self.team1 + " " + str(self.mainTeam1)).replace("[","(").replace("]",")").replace("'","").replace(",",", ").split())) #cambiamos los corchetes por paréntesis, quitamos las comillas, añadimos un espacio después de la coma y ' '.join(mystring.split()) es para quitar los dos espacios seguidos formados en algunos sitios donde al hacer el replace añadio un espacio no necesario 
+        self.textEdit.append(" ".join(("·Segundo equipo (jugador, posición, puntos individuales): " + self.team2 + " " + str(self.mainTeam2)).replace("[","(").replace("]",")").replace("'","").replace(",",", ").split()))
         self.textEdit.append("")
         self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total): ")
         self.textEdit.append("    -" + self.team1+" :" + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2))  +" puntos y " + self.team2 +  ": {} puntos.".format(round(((self.pointsOverallMainTeam2/(self.pointsOverallMainTeam1+self.pointsOverallMainTeam2))*100)*0.3,2)))
@@ -153,11 +153,19 @@ class Window(QDialog):
         
         for player1 in self.mainTeam1:
             for player2 in self.mainTeam2:
-                if player1.split(",")[1] == player2.split(",")[1]:#si coincide las posiciones las guardamos y sus puntuaciones
+                if "-" in player1.split(",")[1]:#si hay un "-" es que es suplente, entonces separamos la posición de manera diferente pero aseguramos que aunque sea suplente se meta en el gráfico
+                    position1 = player1.split(",")[1].split("-")[1]
+                else:
+                    position1 = player1.split(",")[1].replace(" ","") #quitamos el espacio del principio
+                if "-" in player2.split(",")[1]:# el split no haría falta si no fuera por que hay jugadores que tienen guiones en el nombre
+                    position2 = player2.split(",")[1].split("-")[1]
+                else:
+                    position2 = player2.split(",")[1].replace(" ","") #quitamos el espacio del principio
+                    
+                if position1 == position2:#si coincide las posiciones las guardamos y sus puntuaciones
                     team1.append(int(player1.split(",")[2]))
                     team2.append(int(player2.split(",")[2]))
-                    labels.append(player1.split(",")[1])
-        
+                    labels.append(position1)
         
         width = 0.2
         p1 = plt.bar(np.arange(len(labels)) + width/2, team1, color = 'b', width = width)
