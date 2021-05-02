@@ -15,7 +15,7 @@ class Estimate:
         self.mainTeam1 = self.overallCalculation(self.mainTeam1)
         self.mainTeam2 = self.overallCalculation(self.mainTeam2)
 
-
+        print(self.mainTeam2)
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
 
             print("Error, tamaño de equipo incorrecto")
@@ -28,6 +28,7 @@ class Estimate:
             pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(self.mainTeam1)
             pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(self.mainTeam2)
             pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
+            
             
             
             file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe y vamos escribiendo todos los datos que hemos recogido
@@ -205,7 +206,11 @@ class Estimate:
             
         return pointsVS1,pointsVS2
     
-    def filterTeam(self,players):
+    def checkUnbalance(self,team):#esta función comprueba si el equipo esta demasiado desequilibrado, tanto para bien como para mal
+        pass #ojo con el portero
+    
+    
+    def filterTeam(self,players):#borrar cuando no la necesite
         mainTeam = []
         
         for player in players:
