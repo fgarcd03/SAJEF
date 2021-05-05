@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import statistics as st
 
 class Estimate:
     
@@ -15,7 +16,11 @@ class Estimate:
         self.mainTeam1 = self.overallCalculation(self.mainTeam1)
         self.mainTeam2 = self.overallCalculation(self.mainTeam2)
 
-        print(self.mainTeam2)
+        bonusDefense1, bonusMidfield1, bonusForward1 = self.checkUnbalance(self.mainTeam1)
+        bonusDefense2, bonusMidfield2, bonusForward2 = self.checkUnbalance(self.mainTeam2)
+        
+        bonusDefense2 = bonusMidfield2 = bonusForward2 = 0
+        
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
 
             print("Error, tamaño de equipo incorrecto")
@@ -32,23 +37,24 @@ class Estimate:
             
             
             file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe y vamos escribiendo todos los datos que hemos recogido
-            
+            #sumamos aquí los bonos
+            print(pointsOverallDefense2)
             self.fileWrite(file,self.mainTeam1)
             self.fileWrite(file,self.mainTeam2)
             self.fileWrite(file,pointsVSPlayers1)
             self.fileWrite(file,pointsVSPlayer2)
-            self.fileWrite(file,pointsOverallMainTeam1)
-            self.fileWrite(file,pointsOverallMainTeam2)
-            self.fileWrite(file,pointsOverallDefense1)
-            self.fileWrite(file,pointsOverallMidfield1)
-            self.fileWrite(file,pointsOverallForward1)
-            self.fileWrite(file,pointsOverallDefense2)
-            self.fileWrite(file,pointsOverallMidfield2)
-            self.fileWrite(file,pointsOverallForward2)
-            self.fileWrite(file,pointsAttack1)
-            self.fileWrite(file,pointsDefense1)
-            self.fileWrite(file,pointsAttack2)
-            self.fileWrite(file,pointsDefense2)
+            self.fileWrite(file,int(pointsOverallMainTeam1 + (pointsOverallMainTeam1*bonusDefense1/100) + (pointsOverallMainTeam1*bonusMidfield1/100) + (pointsOverallMainTeam1*bonusForward1/100)))#lo que esta entre paréntesis es el porcentaje que sumamos
+            self.fileWrite(file,int(pointsOverallMainTeam2 + (pointsOverallMainTeam2*bonusDefense2/100) + (pointsOverallMainTeam2*bonusMidfield2/100) + (pointsOverallMainTeam2*bonusForward2/100)))
+            self.fileWrite(file,int(pointsOverallDefense1 + (pointsOverallDefense1*bonusDefense1/100)))
+            self.fileWrite(file,int(pointsOverallDefense2 + (pointsOverallDefense2*bonusDefense2/100)))
+            self.fileWrite(file,int(pointsOverallMidfield1 + (pointsOverallMidfield1*bonusMidfield1/100)))
+            self.fileWrite(file,int(pointsOverallMidfield2 + (pointsOverallMidfield2*bonusMidfield2/100)))
+            self.fileWrite(file,int(pointsOverallForward1 + (pointsOverallForward1*bonusForward1/100)))
+            self.fileWrite(file,int(pointsOverallForward2 + (pointsOverallForward2*bonusForward2/100)))
+            self.fileWrite(file,int(pointsAttack1 + (pointsAttack1*bonusMidfield1/100) + (pointsAttack1*bonusForward1/100)))
+            self.fileWrite(file,int(pointsAttack2 + (pointsAttack2*bonusMidfield2/100) + (pointsAttack2*bonusForward2/100)))
+            self.fileWrite(file,int(pointsDefense1 + (pointsDefense1*bonusDefense1/100) + (pointsDefense1*bonusMidfield1/100)))
+            self.fileWrite(file,int(pointsDefense2 + (pointsDefense2*bonusDefense2/100) + (pointsDefense2*bonusMidfield2/100)))
             self.fileWrite(file,team1)
             self.fileWrite(file,team2)
 
@@ -124,11 +130,14 @@ class Estimate:
         grades = grades.split(" ")
         
         for statistic,grade in zip(statistics,grades):
-            if "." in statistic:#si existe un . en el string de la estadistica es que es float y estamos que estamos en la altura del portero y hay que tenerla en cuenta aparte   
-                overall = overall + int(float(statistic))*int(float(grade))
+            if "." in statistic:#si existe un . en el string de la estadistica es que es float y es que estamos en la altura del portero y hay que tenerla en cuenta aparte   
+                if float(statistic) > 180 and float(statistic) < 190:#si está mide entre 180 y 190 contamos la altura para la estadística
+                    overall = overall + int(float(statistic))*int(float(grade))
             else:
                 overall = overall + (int(statistic)*int(grade))
-            
+        
+        if pid == "GK":
+            overall = int(overall * 1.7) #aprovechamos para sumarle artificalmente puntuación para que se iguale la puntuación a la de los compañeros
         mainTeamReturn.append(player +"," + str(overall))
         #no hace falta devolver la lista porque no se pasa como copia
                         
@@ -140,9 +149,7 @@ class Estimate:
         return points1,points2
                 
     def pointsOverallZone(self,mainTeam):
-        zoneDefense = []
-        zoneMidfield = [] 
-        zoneForward = [] #en la lista se almacena de cada zona la puntuacion de cada zona total junto a los jugadores
+        zoneDefense = zoneMidfield = zoneForward = [] #en la lista se almacena de cada zona la puntuacion de cada zona total junto a los jugadores
         pointsDefense =  pointsMidfield = pointsForward = 0
         
         for player in mainTeam:
@@ -206,9 +213,40 @@ class Estimate:
             
         return pointsVS1,pointsVS2
     
+
     def checkUnbalance(self,team):#esta función comprueba si el equipo esta demasiado desequilibrado, tanto para bien como para mal
-        pass #ojo con el portero
-    
+            pointsPlayers = []
+            bonusDefense = bonusMidfield = bonusForward = 0
+            
+            for player in team:#sacamos los puntos de los jugadores
+                pointsPlayers.append(int(player.split(",")[2]))
+            
+            #usamos la regla de las tres sigmas o regla 68-95-99.7
+            mu = st.mean(pointsPlayers) #la media
+            sigma = st.stdev(pointsPlayers) #la desviación típica
+            
+            if st.stdev(pointsPlayers) > 10000: # si la desviación típica es alta es que está muy dispersados los datos, entonces los tratamos (normalmente sera cuando hay suplentes)
+                for points,player in zip(pointsPlayers,team):#recorremos las dos listas a la vez
+                    if points < mu-sigma:# si el jugador destaca para mal
+                        if "GK" in player or "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
+                            bonusDefense = bonusDefense - 9.09 #el 9.09 sería el porcertanje, lo que representaría proporcionalmente un jugador sobre el 100%
+                        if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
+                            bonusMidfield = bonusMidfield - 9.09
+                        if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:
+                            bonusForward = bonusForward - 9.09
+                    if points > mu+sigma:#si el jugador destaca para bien
+                        if "GK" in player or "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
+                            bonusDefense = bonusDefense + 9.09
+                        if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
+                            bonusMidfield = bonusMidfield + 9.09
+                        if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:
+                            bonusForward = bonusForward + 9.09
+                print(bonusDefense)
+                print(bonusMidfield)
+                print(bonusForward)
+                return bonusDefense, bonusMidfield, bonusForward
+            else:
+                return 0,0,0
     
     def filterTeam(self,players):#borrar cuando no la necesite
         mainTeam = []

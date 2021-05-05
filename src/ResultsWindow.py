@@ -57,7 +57,7 @@ class Window(QDialog):
         self.textEdit.append("    -Zona de defensa (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallDefense1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallDefense2[-1]),2)))
         self.textEdit.append("    -Zona del centro del campo (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallMidfield1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallMidfield2[-1]),2)))
         self.textEdit.append("    -Zona delantera (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(float(self.pointsOverallForward1[-1]),2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(float(self.pointsOverallForward2[-1]),2)))
-        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ": " + str(round(((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,2)) +"puntos y " + self.team2 + ": {}  puntos.".format(round(((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2,2)))
+        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ": " + str(round(((pointsZones1/(pointsZones1+pointsZones2)*100))*0.2,2)) + " puntos y " + self.team2 + ": {}  puntos.".format(round(((pointsZones2/(pointsZones1+pointsZones2)*100))*0.2,2)))
         self.textEdit.append("")
         self.textEdit.append("·Puntuaciones de ataque y defensa (30% del total):")
         self.textEdit.append("    -Ataque (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack2,2)))
