@@ -25,7 +25,10 @@ class Estimate:
             #Hacer todo lo demás
             bonusDefense1, bonusMidfield1, bonusForward1 = self.checkUnbalance(self.mainTeam1)
             bonusDefense2, bonusMidfield2, bonusForward2 = self.checkUnbalance(self.mainTeam2)
-            bonusDefense2 = bonusMidfield2 = bonusForward2 = 0 #lo pongo a cero de momento para que no influya
+            print(bonusDefense2)
+            print(bonusMidfield2)
+            print(bonusForward2)
+            #bonusDefense2 = bonusMidfield2 = bonusForward2 = 0 #lo pongo a cero de momento para que no influya
             pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(self.mainTeam1[:],self.mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaria a esas mismas lista fuera de ella
             pointsOverallMainTeam1,pointsOverallMainTeam2 = self.overallMainTeam()
             pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(self.mainTeam1)
@@ -214,7 +217,7 @@ class Estimate:
     
 
     def checkUnbalance(self,team):#esta función comprueba si el equipo esta demasiado desequilibrado, tanto para bien como para mal
-            pointsPlayers = []
+            pointsPlayers = []#REVISAR PUNTUACIONES
             bonusDefense = bonusMidfield = bonusForward = 0
             
             for player in team:#sacamos los puntos de los jugadores
