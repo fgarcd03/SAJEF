@@ -61,6 +61,7 @@ class Estimate:
             file.close()
             
             os.system("python3 ResultsWindow.py &")
+            #exec(open("./ResultsWindow.py").read())
 
     def fileWrite(self,file,listOrInt):
         if isinstance(listOrInt, int) or isinstance(listOrInt, float) or isinstance(listOrInt, str):# si es int, float o cadena entra aquí si no será una lista
