@@ -43,6 +43,8 @@ class Window(QDialog):
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
         self.zoneGraphic = QRadioButton("Gráfico de zonas (defensa, medio, ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
+        self.attackVSdefenseGraphic = QRadioButton("Gráfico de ataque VS defensa",self)
+        self.attackVSdefenseGraphic.clicked.connect(self.attackVSdefenseGraphicConnect)
         self.playerGraphic = QRadioButton("Gráfico de cada jugador",self)
         self.playerGraphic.clicked.connect(self.playerGraphicConnect)
         
@@ -87,6 +89,7 @@ class Window(QDialog):
 
         self.layout.addWidget(self.completeGraphic)
         self.layout.addWidget(self.zoneGraphic)
+        self.layout.addWidget(self.attackVSdefenseGraphic)
         self.layout.addWidget(self.playerGraphic)
 
         self.setLayout(self.layout) 
@@ -94,13 +97,17 @@ class Window(QDialog):
         self.completeGraphicConnect() #Dibujamos un gráfico por defecto
         
     def completeGraphicConnect(self):
-        self.canvas.figure.clear() #elimia el dibujo anterior para que pueda ser dibujado otro grafico
+        self.canvas.figure.clear() #elimina el dibujo anterior para que pueda ser dibujado otro gráfico
         self.plotOverall()
 
     def zoneGraphicConnect(self):
         self.canvas.figure.clear()
         self.plotZones()
-    
+        
+    def attackVSdefenseGraphicConnect(self):    
+        self.canvas.figure.clear()
+        self.plotAttackVSDefense()
+        
     def playerGraphicConnect(self):
         self.canvas.figure.clear()
         self.plotPlayers()
@@ -130,8 +137,7 @@ class Window(QDialog):
         self.canvas.draw() 
 
     def plotZones(self):
-    
-        bars1 = [(self.pointsOverallDefense1/(self.pointsOverallDefense1+self.pointsOverallDefense2))*100,(self.pointsOverallDefense2/(self.pointsOverallDefense1+self.pointsOverallDefense2))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de una  apartado
+        bars1 = [(self.pointsOverallDefense1/(self.pointsOverallDefense1+self.pointsOverallDefense2))*100,(self.pointsOverallDefense2/(self.pointsOverallDefense1+self.pointsOverallDefense2))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de un apartado
         bars2 = [(self.pointsOverallMidfield1/(self.pointsOverallMidfield1+self.pointsOverallMidfield2))*100,(self.pointsOverallMidfield2/(self.pointsOverallMidfield1+self.pointsOverallMidfield2))*100]
         bars3 = [(self.pointsOverallForward1/(self.pointsOverallForward1+self.pointsOverallForward2))*100,(self.pointsOverallForward2/(self.pointsOverallForward1+self.pointsOverallForward2))*100]
         
@@ -140,6 +146,20 @@ class Window(QDialog):
         p3 = plt.bar([0,1], bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.3)
         
         plt.legend((p1[0], p2[0],p3[0]), ("Puntos de la zona de defensa", "Puntos de la zona del centro de campo","Puntos de la zona de ataque"),loc="upper center") 
+
+        plt.xticks([0,1], [self.team1,self.team2], fontweight='bold')
+        plt.ylabel('Puntuación')
+        
+        self.canvas.draw()
+        
+    def plotAttackVSDefense(self):
+        bars1 = [(self.pointsDefense1/(self.pointsDefense1+self.pointsDefense2))*100,(self.pointsDefense2/(self.pointsDefense1+self.pointsDefense2))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de un apartado
+        bars2 = [(self.pointsAttack1/(self.pointsAttack1+self.pointsAttack2))*100,(self.pointsAttack2/(self.pointsAttack1+self.pointsAttack2))*100]
+        
+        p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
+        p2 = plt.bar([0,1], bars2, bottom=bars1, color='g', edgecolor='white', width=0.3)
+        
+        plt.legend((p1[0], p2[0]), ("Puntos de defensa", "Puntos de ataque"),loc="upper center") 
 
         plt.xticks([0,1], [self.team1,self.team2], fontweight='bold')
         plt.ylabel('Puntuación')
@@ -167,15 +187,14 @@ class Window(QDialog):
                     team2.append(int(player2.split(",")[2]))
                     labels.append(position1)
         
-        width = 0.2
-        p1 = plt.bar(np.arange(len(labels)) + width/2, team1, color = 'b', width = width)
-        p2 = plt.bar(np.arange(len(labels)) - width/2, team2, color = 'g', width = width)
+        width = 0.2 #no se porque pero hay que ponerlo así
+        p1 = plt.bar(np.arange(len(labels)) + width/2, team1, color = 'b', width = 0.2)
+        p2 = plt.bar(np.arange(len(labels)) - width/2, team2, color = 'g', width = 0.2)
 
         plt.legend((p1[0], p2[0]), (self.team1, self.team2),loc="upper center") 
 
         plt.xticks(np.arange(len(labels)), labels, fontweight='bold')
         plt.ylabel('Puntuación')
-
 
         self.canvas.draw()
         

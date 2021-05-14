@@ -25,16 +25,20 @@ class Estimate:
             #Hacer todo lo demás
             bonusDefense1, bonusMidfield1, bonusForward1 = self.checkUnbalance(self.mainTeam1)
             bonusDefense2, bonusMidfield2, bonusForward2 = self.checkUnbalance(self.mainTeam2)
-            print(bonusDefense2)
-            print(bonusMidfield2)
-            print(bonusForward2)
-            #bonusDefense2 = bonusMidfield2 = bonusForward2 = 0 #lo pongo a cero de momento para que no influya
-            pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(self.mainTeam1[:],self.mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaria a esas mismas lista fuera de ella
+            
+            pointsVSPlayers1,pointsVSPlayer2 = self.pointsPlayerVSPlayer(self.mainTeam1[:],self.mainTeam2[:])#[:] es para pasarle una copia ya que las dos listas se modifican dentro de la función y afectaría a esas mismas lista fuera de ella
             pointsOverallMainTeam1,pointsOverallMainTeam2 = self.overallMainTeam()
             pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1 = self.pointsOverallZone(self.mainTeam1)
             pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2 = self.pointsOverallZone(self.mainTeam2)
-            pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
             
+            pointsOverallDefense1[-1] = pointsOverallDefense1[-1] + (pointsOverallDefense1[-1]*bonusDefense1/100) #para estas puntuaciones le sumamos las bonificaciones aquí en vez de en la escritura del fichero, así vamos arrastrando los cambios a otros datos
+            pointsOverallDefense2[-1] = pointsOverallDefense2[-1] + (pointsOverallDefense2[-1]*bonusDefense2/100)
+            pointsOverallMidfield1[-1] = pointsOverallMidfield1[-1] + (pointsOverallMidfield1[-1]*bonusMidfield1/100)
+            pointsOverallMidfield2[-1] = pointsOverallMidfield2[-1] + (pointsOverallMidfield2[-1]*bonusMidfield2/100)
+            pointsOverallForward1[-1] = pointsOverallForward1[-1]+ (pointsOverallForward1[-1]*bonusForward1/100)
+            pointsOverallForward2[-1] = pointsOverallForward2[-1] + (pointsOverallForward2[-1]*bonusForward2/100)
+            
+            pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2 = self.pointsAttackVSDefense(pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2)
             
             
             file = open("settings.txt", "w") #abre un archivo de texto, lo crea si no existe y vamos escribiendo todos los datos que hemos recogido
@@ -45,23 +49,23 @@ class Estimate:
             self.fileWrite(file,pointsVSPlayer2)
             self.fileWrite(file,pointsOverallMainTeam1 + (pointsOverallMainTeam1*bonusDefense1/100) + (pointsOverallMainTeam1*bonusMidfield1/100) + (pointsOverallMainTeam1*bonusForward1/100))#lo que esta entre paréntesis es el porcentaje que sumamos
             self.fileWrite(file,pointsOverallMainTeam2 + (pointsOverallMainTeam2*bonusDefense2/100) + (pointsOverallMainTeam2*bonusMidfield2/100) + (pointsOverallMainTeam2*bonusForward2/100))
-            self.fileWrite(file,pointsOverallDefense1[-1] + (pointsOverallDefense1[-1]*bonusDefense1/100))
-            self.fileWrite(file,pointsOverallDefense2[-1] + (pointsOverallDefense2[-1]*bonusDefense2/100))
-            self.fileWrite(file,pointsOverallMidfield1[-1] + (pointsOverallMidfield1[-1]*bonusMidfield1/100))
-            self.fileWrite(file,pointsOverallMidfield2[-1] + (pointsOverallMidfield2[-1]*bonusMidfield2/100))
-            self.fileWrite(file,pointsOverallForward1[-1]+ (pointsOverallForward1[-1]*bonusForward1/100))
-            self.fileWrite(file,pointsOverallForward2[-1] + (pointsOverallForward2[-1]*bonusForward2/100))
-            self.fileWrite(file,pointsAttack1 + (pointsAttack1*bonusMidfield1/100) + (pointsAttack1*bonusForward1/100))
-            self.fileWrite(file,pointsAttack2 + (pointsAttack2*bonusMidfield2/100) + (pointsAttack2*bonusForward2/100))
-            self.fileWrite(file,pointsDefense1 + (pointsDefense1*bonusDefense1/100) + (pointsDefense1*bonusMidfield1/100))
-            self.fileWrite(file,pointsDefense2 + (pointsDefense2*bonusDefense2/100) + (pointsDefense2*bonusMidfield2/100))
+            self.fileWrite(file,pointsOverallDefense1[-1])
+            self.fileWrite(file,pointsOverallDefense2[-1])
+            self.fileWrite(file,pointsOverallMidfield1[-1])
+            self.fileWrite(file,pointsOverallMidfield2[-1])
+            self.fileWrite(file,pointsOverallForward1[-1])
+            self.fileWrite(file,pointsOverallForward2[-1])
+            self.fileWrite(file,pointsAttack1)
+            self.fileWrite(file,pointsAttack2)
+            self.fileWrite(file,pointsDefense1)
+            self.fileWrite(file,pointsDefense2)
             self.fileWrite(file,team1)
             self.fileWrite(file,team2)
 
             file.close()
             
-            os.system("python3 ResultsWindow.py &")
-            #exec(open("./ResultsWindow.py").read())
+            actual_path = os.path.dirname(os.path.realpath(__file__))
+            os.system("python3 {}/ResultsWindow.py &".format(actual_path))
 
     def fileWrite(self,file,listOrInt):
         if isinstance(listOrInt, int) or isinstance(listOrInt, float) or isinstance(listOrInt, str):# si es int, float o cadena entra aquí si no será una lista
@@ -232,11 +236,12 @@ class Estimate:
                 for points,player in zip(pointsPlayers,team):#recorremos las dos listas a la vez
                     if points < mu-sigma:# si el jugador destaca para mal
                         if "GK" in player or "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
-                            bonusDefense = bonusDefense - 9.09 #el 9.09 sería el porcertanje, lo que representaría proporcionalmente un jugador sobre el 100%
+                            bonusDefense = bonusDefense - 9.09 #el 9.09 sería el porcentaje, lo que representaría proporcionalmente un jugador sobre el 100%
                         if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
                             bonusMidfield = bonusMidfield - 9.09
                         if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:
                             bonusForward = bonusForward - 9.09
+                            
                     if points > mu+sigma:#si el jugador destaca para bien
                         if "GK" in player or "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
                             bonusDefense = bonusDefense + 9.09
@@ -244,7 +249,7 @@ class Estimate:
                             bonusMidfield = bonusMidfield + 9.09
                         if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:
                             bonusForward = bonusForward + 9.09
-
+                    
                 return bonusDefense, bonusMidfield, bonusForward
             else:
                 return 0,0,0

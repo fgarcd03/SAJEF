@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout
 from PyQt5.QtGui import QIcon
@@ -14,13 +15,15 @@ class MainWindow(QWidget):
     
     def __init__(self,teams,conexion,parent=None):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
         super().__init__(parent)
+        actualPath = os.path.dirname(os.path.realpath(__file__)) #para saber el directorio actual, usado para que sea compatible con las appimages
+        
         self.teams = teams
         self.conexion = conexion
         
         self.mainTeam2 = [] #El eqipo que creará el usuario
         
         self.setWindowTitle("SAJEF") 
-        self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
+        self.setWindowIcon(QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
         #self.setFixedSize(500, 500)
         
         self.gridLayout = QGridLayout(self)
@@ -75,8 +78,8 @@ class MainWindow(QWidget):
         for index,item in enumerate(teams):
             self.team1.addItem(item[2:-2])     
             self.team2.addItem(item[2:-2])
-            self.team1.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
-            self.team2.setItemIcon(index, QIcon('../resources/iconmonstr-soccer-1-240.png'))
+            self.team1.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
+            self.team2.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
 
         
     def on_combobox_changed(self):
