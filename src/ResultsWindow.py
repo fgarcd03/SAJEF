@@ -215,9 +215,9 @@ class Window(QDialog):
             winTeam1 = True
        
         return pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,winTeam1
+
  
 if __name__ == '__main__':
-
     with open("settings.txt") as fp:
         for i, line in enumerate(fp):     
             if i == 0:

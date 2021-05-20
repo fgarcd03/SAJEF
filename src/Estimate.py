@@ -170,9 +170,9 @@ class Estimate:
                 pointsForward = pointsForward + int(player.split(",")[2])
                 zoneForward.append(player)
         
-        pointsDefense = pointsDefense/len(zoneDefense)#en este caso calculamos la media, no el total, ya que no tiene porque haber el mismo número de jugadores en cada zona
-        pointsMidfield = pointsMidfield/len(zoneMidfield)
-        pointsForward = pointsForward/len(zoneForward)
+        pointsDefense = pointsDefense#/len(zoneDefense)#en este caso calculamos la media, no el total, ya que no tiene porque haber el mismo número de jugadores en cada zona
+        pointsMidfield = pointsMidfield#/len(zoneMidfield)
+        pointsForward = pointsForward#/len(zoneForward)
         
         zoneDefense.append(pointsDefense) #añadimos la media a la propia lista
         zoneMidfield.append(pointsMidfield)
@@ -182,10 +182,10 @@ class Estimate:
     
     def pointsAttackVSDefense(self,pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2):
         
-        pointsAttack1 = (pointsOverallMidfield1[-1] + pointsOverallForward1[-1])/(len(pointsOverallMidfield1)+len(pointsOverallForward1)-2) #para calcular los puntos de ataque sumamos la media de la delantera y el medio y hacemos la media
-        pointsDefense1 = (pointsOverallMidfield1[-1] + pointsOverallDefense1[-1])/(len(pointsOverallMidfield1)+len(pointsOverallDefense1)-2) #el -2 esta puesto porque al final de la lista esta la media almacenada
-        pointsAttack2 = (pointsOverallMidfield2[-1] + pointsOverallForward2[-1])/(len(pointsOverallMidfield2)+len(pointsOverallForward2)-2)
-        pointsDefense2 = (pointsOverallMidfield2[-1] + pointsOverallDefense2[-1])/(len(pointsOverallMidfield2)+len(pointsOverallDefense2)-2)
+        pointsAttack1 = (pointsOverallMidfield1[-1]/2 + pointsOverallForward1[-1])#/(len(pointsOverallMidfield1)+len(pointsOverallForward1)-2) #para calcular los puntos de ataque sumamos la media de la delantera y el medio y hacemos la media
+        pointsDefense1 = (pointsOverallMidfield1[-1]/2 + pointsOverallDefense1[-1])#/(len(pointsOverallMidfield1)+len(pointsOverallDefense1)-2) #el -2 esta puesto porque al final de la lista esta la media almacenada y restas, 1 por cada media
+        pointsAttack2 = (pointsOverallMidfield2[-1]/2 + pointsOverallForward2[-1])#/(len(pointsOverallMidfield2)+len(pointsOverallForward2)-2)
+        pointsDefense2 = (pointsOverallMidfield2[-1]/2 + pointsOverallDefense2[-1])#/(len(pointsOverallMidfield2)+len(pointsOverallDefense2)-2)
         
         return pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2
     
@@ -197,7 +197,7 @@ class Estimate:
                 if player1.split(",")[1] == player2.split(",")[1]:#si coincide la misma posición
                     if int(player1.split(",")[2]) > int(player2.split(",")[2]):#restamos los puntos de cada posición y lo sumamos al total del que ha ganado
                         pointsVS1 = pointsVS1 + (int(player1.split(",")[2]) - int(player2.split(",")[2]))
-                    elif int(player1.split(",")[2]) < int(player2.split(",")[2]):# si tiene los mismo puntos(no suma ni resta)
+                    elif int(player1.split(",")[2]) < int(player2.split(",")[2]):# si tiene los mismos puntos(no suma ni resta)
                         pointsVS2 = pointsVS2 + (int(player2.split(",")[2]) - int(player1.split(",")[2]))
                     
                     listaAux1.append(player1)
