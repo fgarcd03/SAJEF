@@ -76,12 +76,15 @@ class Estimate:
             file.write("\n")  
             
     def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
-        players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{team}' RETURN DISTINCT p.name,r.teamPosition".format(team=self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
+        players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
         players1 = [player[1:-1] for player in players1]
 
-        self.mainTeam1 = self.filterTeam(players1)
+        self.mainTeam1 = self.filterTeam(players1) #no haria falta teoricamente
+        
+        #MI INTENCION AQUI SERIA:INTENTAR GANAR EN TODAS LAS AREAS POSIBLES
 
+    
         
     def overallCalculation(self,mainTeam):#aquí calculamos los puntos totales de cada jugador en el enfrentamiento
         mainTeamReturn = [] #hacemos una nueva lista para meter los jugadores con el overall
@@ -99,7 +102,7 @@ class Estimate:
             if "CDM" in player or "RDM" in player or "LDM" in player:
                 self.overallCalculationAux(mainTeamReturn, "CDMaLDMaRDM", player)
         
-            if "CM" in player and "LCM" not in player and "RCM" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
+            if "CM" in player and "LCM" not in player and "RCM" not in player:#los not in son para evitar que algunos jugadores entren en mas de un if(porque coincide el término de búsqueda)
                 self.overallCalculationAux(mainTeamReturn, "CM", player)
         
             if "LCM" in player or "RCM" in player or "LM" in player or "RM" in player:
@@ -178,10 +181,10 @@ class Estimate:
     
     def pointsAttackVSDefense(self,pointsOverallDefense1,pointsOverallMidfield1, pointsOverallForward1,pointsOverallDefense2,pointsOverallMidfield2, pointsOverallForward2):
         
-        pointsAttack1 = (pointsOverallMidfield1[-1]/3 + pointsOverallForward1[-1]) #/3 (antes /2) para que el centro del campo valga enos REVISAR
-        pointsDefense1 = (pointsOverallMidfield1[-1]/3 + pointsOverallDefense1[-1])
-        pointsAttack2 = (pointsOverallMidfield2[-1]/3 + pointsOverallForward2[-1])
-        pointsDefense2 = (pointsOverallMidfield2[-1]/3 + pointsOverallDefense2[-1])
+        pointsAttack1 = (pointsOverallMidfield1[-1]/2 + pointsOverallForward1[-1]) #/2 para que el centro del campo valga menos
+        pointsDefense1 = (pointsOverallMidfield1[-1]/2 + pointsOverallDefense1[-1])
+        pointsAttack2 = (pointsOverallMidfield2[-1]/2 + pointsOverallForward2[-1])
+        pointsDefense2 = (pointsOverallMidfield2[-1]/2 + pointsOverallDefense2[-1])
         
         return pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2
     

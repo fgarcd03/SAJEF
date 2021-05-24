@@ -206,8 +206,10 @@ class Window(QDialog):
         pointsZones1 = self.pointsOverallDefense1 + self.pointsOverallMidfield1 + self.pointsOverallForward1
         pointsZones2 = self.pointsOverallDefense2 + self.pointsOverallMidfield2 + self.pointsOverallForward2
         
-        pointsAttackDefense1 = self.pointsAttack1 + self.pointsDefense1
-        pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
+        #pointsAttackDefense1 = self.pointsAttack1 + self.pointsDefense1
+        #pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
+        pointsAttackDefense1 = self.pointsAttack1 - self.pointsDefense2
+        pointsAttackDefense2 = self.pointsAttack2 - self.pointsDefense1
         
 
         totalTeam1 = (((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3) + (((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2) + (((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3) + (((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2)
