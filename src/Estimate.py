@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import statistics as st
+import itertools as it
 
 class Estimate:
     
@@ -9,6 +10,7 @@ class Estimate:
         self.conexion = conexion
         self.team1 = team1
         self.team2 = team2
+        self.mainTeam1 = []
         self.mainTeam2 = mainTeam2
         
         self.createMainTeam1()#El equipo 2 no creamos mainTeam porque ya lo hace el usuario
@@ -76,15 +78,58 @@ class Estimate:
             file.write("\n")  
             
     def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
+        defense = []
+        midfield = []
+        forward = []
+        defenseCombined = [] #estas listas almacenan las combinaciones de jugadores, es decir jugador a con b, a con c, b con c,etc
+        midfieldCombined = []
+        forwardCombined = []
+        positionsDefense = ["LB","LWB","LCB","RCB","RB","RWB","CB"]
+        positionsMidfield = ["CDM","CM","LCM","RCM","CAM","LM","RM","RDM","LDM","LAM","RAM"]
+        positionsForward = ["CF","ST","LW","RW","LS","RS"]
+        
+        
         players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
         players1 = [player[1:-1] for player in players1]
-
-        self.mainTeam1 = self.filterTeam(players1) #no haria falta teoricamente
         
-        #MI INTENCION AQUI SERIA:INTENTAR GANAR EN TODAS LAS AREAS POSIBLES
-
-    
+        #print(players1)
+        #self.mainTeam1 = self.filterTeam(players1) #no haria falta teoricamente
+        
+        #Para elegir el equipo: el portero será el titular, con 4 defensas, 3 centrocanpistas y 3 delanteros
+        #Recorremos con un for los jugadores
+        for player in players1:
+            if player.split(",")[1] == " GK": #Si es portero titular lo añadimos sin mas
+                self.mainTeam1.append(player)
+            #El resto de jugadores los metemos en una lista según sea defensa,medio o ataque
+            if "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
+                defense.append(player)        
+            if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
+                midfield.append(player)
+            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
+                forward.append(player)
+        
+        defense = [i.replace(i.split(",")[1],'') for i in defense] #quitamos la posicion de los jugadores ya que ya sabemos si son defensa,medio, o ataque
+        defense = [i.replace(",",'') for i in defense] #quitamos la coma del final de los nombres
+        midfield = [i.replace(i.split(",")[1],'') for i in midfield]
+        midfield = [i.replace(",",'') for i in midfield]
+        forward = [i.replace(i.split(",")[1],'') for i in forward]
+        forward = [i.replace(",",'') for i in forward]
+        
+        #Primero hacemos combinatoria de los jugadores
+        #Defensa
+        defenseCombined = list(it.combinations(defense, 4)) #hacemos la combinatoria de todos los jugadores de esa zona y cojemos 4
+        defenseCombined = list(set(defenseCombined)) #quitamos los repetidos si los hubiera convirtiendo a set y lo convertimos otra vez a lista
+        #Medio
+        midfieldCombined = list(it.combinations(midfield, 3))
+        midfieldCombined = list(set(midfieldCombined))
+        #Delantera
+        forwardCombined = list(it.combinations(forward, 3))
+        forwardCombined = list(set(forwardCombined))
+        
+        print(defenseCombined)
+        print(midfieldCombined)
+        print(forwardCombined)
         
     def overallCalculation(self,mainTeam):#aquí calculamos los puntos totales de cada jugador en el enfrentamiento
         mainTeamReturn = [] #hacemos una nueva lista para meter los jugadores con el overall
@@ -169,7 +214,7 @@ class Estimate:
             if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
                 pointsMidfield = pointsMidfield + int(player.split(",")[2])
                 zoneMidfield.append(player)
-            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
+            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
                 pointsForward = pointsForward + int(player.split(",")[2])
                 zoneForward.append(player)
         
