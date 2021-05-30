@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
-import Estimate #archivo donde va el algotirmo de cálculo
+import Estimate #archivo donde va el algoritmo de cálculo
 
 class MainWindow(QWidget):
     

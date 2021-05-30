@@ -78,12 +78,14 @@ class Estimate:
             file.write("\n")  
             
     def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
+        aux = [] #para meter los jugadores y posiciones junto a su puntuación total
         defense = []
         midfield = []
         forward = []
         defenseCombined = [] #estas listas almacenan las combinaciones de jugadores, es decir jugador a con b, a con c, b con c,etc
         midfieldCombined = []
         forwardCombined = []
+        combined = []
         positionsDefense = ["LB","LWB","LCB","RCB","RB","RWB","CB"]
         positionsMidfield = ["CDM","CM","LCM","RCM","CAM","LM","RM","RDM","LDM","LAM","RAM"]
         positionsForward = ["CF","ST","LW","RW","LS","RS"]
@@ -109,7 +111,7 @@ class Estimate:
             if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
                 forward.append(player)
         
-        defense = [i.replace(i.split(",")[1],'') for i in defense] #quitamos la posicion de los jugadores ya que ya sabemos si son defensa,medio, o ataque
+        defense = [i.replace(i.split(",")[1],'') for i in defense] #quitamos la posición de los jugadores ya que ya sabemos si son defensa,medio, o ataque
         defense = [i.replace(",",'') for i in defense] #quitamos la coma del final de los nombres
         midfield = [i.replace(i.split(",")[1],'') for i in midfield]
         midfield = [i.replace(",",'') for i in midfield]
@@ -127,10 +129,70 @@ class Estimate:
         forwardCombined = list(it.combinations(forward, 3))
         forwardCombined = list(set(forwardCombined))
         
-        print(defenseCombined)
-        print(midfieldCombined)
-        print(forwardCombined)
+        defense.clear()
+        midfield.clear()
+        forward.clear()
+        total = 0
+        #ahora recorremos la lista anteriores para probar las puntuaciones
+        for players in defenseCombined:
+            aux.clear()
+            combined = [list(zip(x,players)) for x in it.permutations(positionsDefense,len(players))] #ahora hacemos combinatoria de cada grupo de jugadores que obtenemos con las posiciones posibles
+            for combination in combined:
+                for player in combination:#para cada combinación de jugadores y posiciones tenemos que calcular la puntuación
+                    points = self.createMainTeamAux(player)
+                    aux.append(points)#metemos en una lista auxiliar
+                if sum(aux) > total: #si la suma de todas las puntuaciones es mayor que el total, guardamos el total y la lista
+                    defense.clear()
+                    total = sum(aux)
+                    for player in combination:
+                        defense.append(player[1] + "," + player[0])
         
+        total = 0
+        for players in midfieldCombined:
+            aux.clear()
+            combined = [list(zip(x,players)) for x in it.permutations(positionsMidfield,len(players))]
+            for combination in combined:
+                for player in combination:
+                    points = self.createMainTeamAux(player)
+                    aux.append(points)
+                if sum(aux) > total:
+                    midfield.clear()
+                    total = sum(aux)
+                    for player in combination:
+                        midfield.append(player[1] + "," + player[0])
+        
+        total = 0
+        for players in forwardCombined:
+            aux.clear()
+            combined = [list(zip(x,players)) for x in it.permutations(positionsForward,len(players))]
+            for combination in combined:
+                for player in combination:
+                    points = self.createMainTeamAux(player)
+                    aux.append(points)
+                if sum(aux) > total:
+                    midfield.clear()
+                    total = sum(aux)
+                    for player in combination:
+                        midfield.append(player[1] + "," + player[0])
+        
+        #usar extend
+    def createMainTeamAux(self,player):#le pasamos la lista, el jugador de la base de datos
+        statistics = grades = overall = 0
+        print(player[0])
+        print(player[1])
+        statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=player[1]))
+        grades = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=player[0]))
+        
+        statistics = statistics[0].replace(",","")[1:-1]
+        statistics = statistics.split(" ")
+        grades = grades[0].replace(",","")[1:-1]
+        grades = grades.split(" ")
+        
+        for statistic,grade in zip(statistics,grades):
+            overall = overall + (int(statistic)*int(grade))
+        
+        return overall
+    
     def overallCalculation(self,mainTeam):#aquí calculamos los puntos totales de cada jugador en el enfrentamiento
         mainTeamReturn = [] #hacemos una nueva lista para meter los jugadores con el overall
         for player in mainTeam:
@@ -190,7 +252,7 @@ class Estimate:
                 overall = overall + (int(statistic)*int(grade))
         
         if pid == "GK":
-            overall = int(overall * 1.7) #aprovechamos para sumarle artificalmente puntuación para que se iguale la puntuación a la de los compañeros
+            overall = int(overall * 1.7) #aprovechamos para sumarle artificialmente puntuación para que se iguale la puntuación a la de los compañeros
         mainTeamReturn.append(player +"," + str(overall))
         #no hace falta devolver la lista porque no se pasa como copia
                         
