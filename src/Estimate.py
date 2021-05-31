@@ -76,7 +76,29 @@ class Estimate:
             for item in listOrInt:
                 file.write("%s;" % item)
             file.write("\n")  
-            
+    
+    def dataCache(self):#esta función sirve para cachear algunos datos de la base de datos y aliviar de consultas a la misma
+        positions = [["CBaLCBaRCB"],
+                     ["LBaLWBaRBaRWB"],
+                     ["CDMaLDMaRDM"],
+                     ["CM"],
+                     ["LMaLCMaRMaRCM"],
+                     ["CAMaLAMaRAM"],
+                     ["CFaLSaRS"],
+                     ["ST"],
+                     ["LWaRW"]] #el portero no lo necesitamos
+        
+        for i in range(len(positions)):
+            query = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=positions[i][0]))
+            positions[i].extend(query)
+        """    
+        for i in range(len(positions)):
+            for j in range(len(positions[i])):
+                print(positions[i][j] + " ",end="")
+            print("\n")
+        """    
+        return positions
+    
     def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
         aux = [] #para meter los jugadores y posiciones junto a su puntuación total
         defense = []
@@ -86,10 +108,12 @@ class Estimate:
         midfieldCombined = []
         forwardCombined = []
         combined = []
+        grades = []
         positionsDefense = ["LB","LWB","LCB","RCB","RB","RWB","CB"]
         positionsMidfield = ["CDM","CM","LCM","RCM","CAM","LM","RM","RDM","LDM","LAM","RAM"]
         positionsForward = ["CF","ST","LW","RW","LS","RS"]
         
+        grades = self.dataCache()
         
         players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
@@ -108,7 +132,7 @@ class Estimate:
                 defense.append(player)        
             if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
                 midfield.append(player)
-            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
+            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entren en más de un if(porque coincide el término de búsqueda)
                 forward.append(player)
         
         defense = [i.replace(i.split(",")[1],'') for i in defense] #quitamos la posición de los jugadores ya que ya sabemos si son defensa,medio, o ataque
@@ -119,13 +143,10 @@ class Estimate:
         forward = [i.replace(",",'') for i in forward]
         
         #Primero hacemos combinatoria de los jugadores
-        #Defensa
         defenseCombined = list(it.combinations(defense, 4)) #hacemos la combinatoria de todos los jugadores de esa zona y cojemos 4
         defenseCombined = list(set(defenseCombined)) #quitamos los repetidos si los hubiera convirtiendo a set y lo convertimos otra vez a lista
-        #Medio
         midfieldCombined = list(it.combinations(midfield, 3))
         midfieldCombined = list(set(midfieldCombined))
-        #Delantera
         forwardCombined = list(it.combinations(forward, 3))
         forwardCombined = list(set(forwardCombined))
         
@@ -137,10 +158,11 @@ class Estimate:
         for players in defenseCombined:
             aux.clear()
             combined = [list(zip(x,players)) for x in it.permutations(positionsDefense,len(players))] #ahora hacemos combinatoria de cada grupo de jugadores que obtenemos con las posiciones posibles
+            #ESTO SE PUEDE METER EN UNA FUNCIÓN
             for combination in combined:
                 for player in combination:#para cada combinación de jugadores y posiciones tenemos que calcular la puntuación
-                    points = self.createMainTeamAux(player)
-                    aux.append(points)#metemos en una lista auxiliar
+                    points = self.createMainTeamAux(player[:],grades) #importante!, le enviamos una copia
+                    aux.append(points) #metemos en una lista auxiliar
                 if sum(aux) > total: #si la suma de todas las puntuaciones es mayor que el total, guardamos el total y la lista
                     defense.clear()
                     total = sum(aux)
@@ -153,7 +175,7 @@ class Estimate:
             combined = [list(zip(x,players)) for x in it.permutations(positionsMidfield,len(players))]
             for combination in combined:
                 for player in combination:
-                    points = self.createMainTeamAux(player)
+                    points = self.createMainTeamAux(player[:],grades)
                     aux.append(points)
                 if sum(aux) > total:
                     midfield.clear()
@@ -167,28 +189,60 @@ class Estimate:
             combined = [list(zip(x,players)) for x in it.permutations(positionsForward,len(players))]
             for combination in combined:
                 for player in combination:
-                    points = self.createMainTeamAux(player)
+                    points = self.createMainTeamAux(player[:],grades)
                     aux.append(points)
                 if sum(aux) > total:
-                    midfield.clear()
+                    forward.clear()
                     total = sum(aux)
                     for player in combination:
-                        midfield.append(player[1] + "," + player[0])
+                        forward.append(player[1] + "," + player[0])
         
-        #usar extend
-    def createMainTeamAux(self,player):#le pasamos la lista, el jugador de la base de datos
-        statistics = grades = overall = 0
-        print(player[0])
-        print(player[1])
+        self.mainTeam1.extend(defense)
+        self.mainTeam1.extend(midfield)
+        self.mainTeam1.extend(forward)
+        print(self.mainTeam1)
+        
+    def createMainTeamAux(self,player,grades):#le pasamos la lista, el jugador de la base de datos
+        statistics = overall = 0
+        oneGrade = []
+        
+        player = list(player) #convertimos la tupla a lista para que sea editable
+        #hacemos los cambios pertinentes para adaptarlos a la base de datos(CM,ST y GK no hace falta)
+        if player[0] == "CB" or player[0] == "RCB" or player[0] == "LCB":
+            player[0] = "CBaLCBaRCB"
+            
+        if player[0] == "LB" or player[0] == "LWB" or player[0] == "RB" or player[0] == "RWB":
+            player[0] = "LBaLWBaRBaRWB"
+            
+        if player[0] == "CDM" or player[0] == "LDM" or player[0] == "RDM":
+            player[0] = "CDMaLDMaRDM"
+        
+        if player[0] == "LM"  or player[0] == "LCM" or player[0] == "RM" or player[0] == "RCM":
+            player[0] = "LMaLCMaRMaRCM"
+        
+        if player[0] == "CAM" or player[0] == "LAM" or player[0] == "RAM":
+            player[0] = "CAMaLAMaRAM"
+        
+        if player[0] == "CF" or player[0] == "LS" or player[0] == "RS":
+            player[0] = "CFaLSaRS"
+            
+        if player[0] == "LW" or player[0] == "RW":
+            player[0] = "LWaRW"
+            
+        for i in range(len(grades)):#obtenemos la lista correcta de notas de la posición indicada
+            if grades[i][0] == player[0]:
+                oneGrade = grades[i]
+        
         statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=player[1]))
-        grades = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=player[0]))
         
         statistics = statistics[0].replace(",","")[1:-1]
         statistics = statistics.split(" ")
-        grades = grades[0].replace(",","")[1:-1]
-        grades = grades.split(" ")
-        
-        for statistic,grade in zip(statistics,grades):
+        oneGrade = oneGrade[1:]#quitamos el primer elemento que incluye la posición
+        oneGrade = ''.join(oneGrade)#convertimos a string
+        oneGrade = oneGrade.replace(",","")[1:-1]
+        oneGrade = oneGrade.split(" ")
+
+        for statistic,grade in zip(statistics,oneGrade):
             overall = overall + (int(statistic)*int(grade))
         
         return overall
