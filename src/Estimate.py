@@ -3,6 +3,7 @@
 import os
 import statistics as st
 import itertools as it
+import numpy as np
 
 class Estimate:
     
@@ -77,8 +78,9 @@ class Estimate:
                 file.write("%s;" % item)
             file.write("\n")  
     
-    def dataCache(self):#esta función sirve para cachear algunos datos de la base de datos y aliviar de consultas a la misma
-        positions = [["CBaLCBaRCB"],
+    def dataCache(self,players1):#esta función sirve para cachear algunos datos de la base de datos y aliviar de consultas a la misma
+        #aquí cacheamos las posiciones
+        positions = [["CBaLCBaRCB"], #hacemos una matriz para meter los datos de forma
                      ["LBaLWBaRBaRWB"],
                      ["CDMaLDMaRDM"],
                      ["CM"],
@@ -91,13 +93,26 @@ class Estimate:
         for i in range(len(positions)):
             query = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=positions[i][0]))
             positions[i].extend(query)
-        """    
+            
         for i in range(len(positions)):
             for j in range(len(positions[i])):
                 print(positions[i][j] + " ",end="")
             print("\n")
-        """    
-        return positions
+        
+        
+        #aquí cacheamos los puntos de los jugadores
+        players1 = np.array([players1]).T.tolist() #convertimos la lista en una matriz vertical
+
+        for i in range(len(players1)):
+            query = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=players1[i][0].split(",")[0]))
+            players1[i].extend(query)
+        
+        for i in range(len(players1)):
+            for j in range(len(players1[i])):
+                print(players1[i][j] + " ",end="")
+            print("\n")
+            
+        return positions,players1
     
     def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
         aux = [] #para meter los jugadores y posiciones junto a su puntuación total
@@ -109,15 +124,16 @@ class Estimate:
         forwardCombined = []
         combined = []
         grades = []
+        statistics = []
         positionsDefense = ["LB","LWB","LCB","RCB","RB","RWB","CB"]
         positionsMidfield = ["CDM","CM","LCM","RCM","CAM","LM","RM","RDM","LDM","LAM","RAM"]
         positionsForward = ["CF","ST","LW","RW","LS","RS"]
         
-        grades = self.dataCache()
-        
         players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
         players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
         players1 = [player[1:-1] for player in players1]
+        
+        grades,statistics = self.dataCache(players1)
         
         #print(players1)
         #self.mainTeam1 = self.filterTeam(players1) #no haria falta teoricamente
@@ -161,7 +177,7 @@ class Estimate:
             #ESTO SE PUEDE METER EN UNA FUNCIÓN
             for combination in combined:
                 for player in combination:#para cada combinación de jugadores y posiciones tenemos que calcular la puntuación
-                    points = self.createMainTeamAux(player[:],grades) #importante!, le enviamos una copia
+                    points = self.createMainTeamAux(player[:],grades,statistics) #importante!, le enviamos una copia
                     aux.append(points) #metemos en una lista auxiliar
                 if sum(aux) > total: #si la suma de todas las puntuaciones es mayor que el total, guardamos el total y la lista
                     defense.clear()
@@ -175,7 +191,7 @@ class Estimate:
             combined = [list(zip(x,players)) for x in it.permutations(positionsMidfield,len(players))]
             for combination in combined:
                 for player in combination:
-                    points = self.createMainTeamAux(player[:],grades)
+                    points = self.createMainTeamAux(player[:],grades,statistics)
                     aux.append(points)
                 if sum(aux) > total:
                     midfield.clear()
@@ -189,7 +205,7 @@ class Estimate:
             combined = [list(zip(x,players)) for x in it.permutations(positionsForward,len(players))]
             for combination in combined:
                 for player in combination:
-                    points = self.createMainTeamAux(player[:],grades)
+                    points = self.createMainTeamAux(player[:],grades,statistics)
                     aux.append(points)
                 if sum(aux) > total:
                     forward.clear()
@@ -202,9 +218,10 @@ class Estimate:
         self.mainTeam1.extend(forward)
         print(self.mainTeam1)
         
-    def createMainTeamAux(self,player,grades):#le pasamos la lista, el jugador de la base de datos
-        statistics = overall = 0
+    def createMainTeamAux(self,player,grades,statistics):#le pasamos la lista, el jugador de la base de datos
+        overall = 0
         oneGrade = []
+        oneStatistics = []
         
         player = list(player) #convertimos la tupla a lista para que sea editable
         #hacemos los cambios pertinentes para adaptarlos a la base de datos(CM,ST y GK no hace falta)
@@ -233,16 +250,20 @@ class Estimate:
             if grades[i][0] == player[0]:
                 oneGrade = grades[i]
         
-        statistics = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=player[1]))
+        for i in range(len(statistics)):#obtenemos la lista correcta de la estadística del jugador
+            if statistics[i][0].split(",")[0] == player[1]:#comparamos si tiene el mismo nombre
+                oneStatistics = statistics[i]
         
-        statistics = statistics[0].replace(",","")[1:-1]
-        statistics = statistics.split(" ")
         oneGrade = oneGrade[1:]#quitamos el primer elemento que incluye la posición
         oneGrade = ''.join(oneGrade)#convertimos a string
         oneGrade = oneGrade.replace(",","")[1:-1]
         oneGrade = oneGrade.split(" ")
+        oneStatistics = oneStatistics[1:]
+        oneStatistics = ''.join(oneStatistics)
+        oneStatistics = oneStatistics.replace(",","")[1:-1]
+        oneStatistics = oneStatistics.split(" ")
 
-        for statistic,grade in zip(statistics,oneGrade):
+        for statistic,grade in zip(oneStatistics,oneGrade):
             overall = overall + (int(statistic)*int(grade))
         
         return overall
