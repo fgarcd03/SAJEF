@@ -208,10 +208,15 @@ class Window(QDialog):
         
         #pointsAttackDefense1 = self.pointsAttack1 + self.pointsDefense1
         #pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
-        pointsAttackDefense1 = self.pointsAttack1 - self.pointsDefense2
-        pointsAttackDefense2 = self.pointsAttack2 - self.pointsDefense1
+        pointsAttackDefense1 = self.pointsDefense1 - self.pointsAttack2
+        pointsAttackDefense2 = self.pointsDefense2 - self.pointsAttack1
         
-
+        print(pointsAttack1)
+        print(pointsAttack2)
+        print(pointsDefense1)
+        print(pointsDefense2)
+        print(pointsAttackDefense1)
+        print(pointsAttackDefense2)
         totalTeam1 = (((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3) + (((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2) + (((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3) + (((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2)
         totalTeam2 = (((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3) + (((pointsZones2/(SCOREADJUSTMENT+pointsZones2)*100))*0.2) + (((pointsAttackDefense2/(SCOREADJUSTMENT+pointsAttackDefense2)*100))*0.3) + (((self.pointsVSPlayers2/(SCOREADJUSTMENT+self.pointsVSPlayers2)*100))*0.2)
         

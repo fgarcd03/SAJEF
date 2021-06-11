@@ -4,6 +4,7 @@ import os
 import statistics as st
 import itertools as it
 import numpy as np
+import copy
 
 class Estimate:
     
@@ -19,6 +20,8 @@ class Estimate:
         self.mainTeam1 = self.overallCalculation(self.mainTeam1)
         self.mainTeam2 = self.overallCalculation(self.mainTeam2)
         
+        print(self.mainTeam1)
+        print(self.mainTeam2)
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
 
             print("Error, tamaño de equipo incorrecto")
@@ -93,12 +96,6 @@ class Estimate:
         for i in range(len(positions)):
             query = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=positions[i][0]))
             positions[i].extend(query)
-            
-        for i in range(len(positions)):
-            for j in range(len(positions[i])):
-                print(positions[i][j] + " ",end="")
-            print("\n")
-        
         
         #aquí cacheamos los puntos de los jugadores
         players1 = np.array([players1]).T.tolist() #convertimos la lista en una matriz vertical
@@ -106,11 +103,6 @@ class Estimate:
         for i in range(len(players1)):
             query = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=players1[i][0].split(",")[0]))
             players1[i].extend(query)
-        
-        for i in range(len(players1)):
-            for j in range(len(players1[i])):
-                print(players1[i][j] + " ",end="")
-            print("\n")
             
         return positions,players1
     
@@ -134,9 +126,7 @@ class Estimate:
         players1 = [player[1:-1] for player in players1]
         
         grades,statistics = self.dataCache(players1)
-        
-        #print(players1)
-        #self.mainTeam1 = self.filterTeam(players1) #no haria falta teoricamente
+        #self.mainTeam1 = self.filterTeam(players1) #en caso de que no quiera hacer la combinatoria y facer el equipo sin más, descomentar esta línea y comentar lo que hay quedabo y en la línea de justo más arriba
         
         #Para elegir el equipo: el portero será el titular, con 4 defensas, 3 centrocanpistas y 3 delanteros
         #Recorremos con un for los jugadores
@@ -183,7 +173,7 @@ class Estimate:
                     defense.clear()
                     total = sum(aux)
                     for player in combination:
-                        defense.append(player[1] + "," + player[0])
+                        defense.append(player[1] + ", " + player[0])
         
         total = 0
         for players in midfieldCombined:
@@ -197,7 +187,7 @@ class Estimate:
                     midfield.clear()
                     total = sum(aux)
                     for player in combination:
-                        midfield.append(player[1] + "," + player[0])
+                        midfield.append(player[1] + ", " + player[0])
         
         total = 0
         for players in forwardCombined:
@@ -211,18 +201,17 @@ class Estimate:
                     forward.clear()
                     total = sum(aux)
                     for player in combination:
-                        forward.append(player[1] + "," + player[0])
+                        forward.append(player[1] + ", " + player[0])
         
         self.mainTeam1.extend(defense)
         self.mainTeam1.extend(midfield)
         self.mainTeam1.extend(forward)
-        print(self.mainTeam1)
-        
+    
     def createMainTeamAux(self,player,grades,statistics):#le pasamos la lista, el jugador de la base de datos
         overall = 0
         oneGrade = []
         oneStatistics = []
-        
+        #print(statistics)
         player = list(player) #convertimos la tupla a lista para que sea editable
         #hacemos los cambios pertinentes para adaptarlos a la base de datos(CM,ST y GK no hace falta)
         if player[0] == "CB" or player[0] == "RCB" or player[0] == "LCB":
@@ -251,11 +240,11 @@ class Estimate:
                 oneGrade = grades[i]
         
         for i in range(len(statistics)):#obtenemos la lista correcta de la estadística del jugador
-            if statistics[i][0].split(",")[0] == player[1]:#comparamos si tiene el mismo nombre
+            if statistics[i][0].split(",")[0] == player[1]: #comparamos si tiene el mismo nombre
                 oneStatistics = statistics[i]
         
-        oneGrade = oneGrade[1:]#quitamos el primer elemento que incluye la posición
-        oneGrade = ''.join(oneGrade)#convertimos a string
+        oneGrade = oneGrade[1:] #quitamos el primer elemento que incluye la posición
+        oneGrade = ''.join(oneGrade) #convertimos a string
         oneGrade = oneGrade.replace(",","")[1:-1]
         oneGrade = oneGrade.split(" ")
         oneStatistics = oneStatistics[1:]
@@ -367,7 +356,7 @@ class Estimate:
         pointsDefense1 = (pointsOverallMidfield1[-1]/2 + pointsOverallDefense1[-1])
         pointsAttack2 = (pointsOverallMidfield2[-1]/2 + pointsOverallForward2[-1])
         pointsDefense2 = (pointsOverallMidfield2[-1]/2 + pointsOverallDefense2[-1])
-        
+
         return pointsAttack1,pointsDefense1,pointsAttack2,pointsDefense2
     
     def pointsPlayerVSPlayer(self,mainTeam1,mainTeam2): #comparamos posición por posición y se restan, el que tenga mas puntos se lleva la diferencia para el equipo, si no existe la posición cuenta como si fuera cero
@@ -395,7 +384,7 @@ class Estimate:
                     listaAux1.append(player1)
                     listaAux2.append(player2)
                     break #para que no siga en el bucle interior buscando ya que lo ha encontrado si esta aquí
-        
+        """De momento lo quitamos porque  creo que es mas justo asi
         for player1 in listaAux1:
             if player1 in mainTeam1:#vamos quitando los jugadores comparados
                 mainTeam1.remove(player1)
@@ -404,12 +393,13 @@ class Estimate:
             if player2 in mainTeam2:#vamos quitando los jugadores comparados
                 mainTeam2.remove(player2)
 
-        #Si hay posiciones que no se repiten en los equipos, añadimos los puntos totales de los jugadores
+        
+        #Si hay posiciones que no se repiten en los equipos, añadimos a los puntos totales de los jugadores
         for player1 in mainTeam1:
             pointsVS1 = pointsVS1 + int(player1.split(",")[2])
         for player2 in mainTeam2:
             pointsVS2 = pointsVS2 + int(player2.split(",")[2])
-            
+        """    
         return pointsVS1,pointsVS2
     
 
