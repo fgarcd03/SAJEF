@@ -4,7 +4,7 @@
 import sys
 import os
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout,QCheckBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
@@ -15,20 +15,17 @@ class MainWindow(QWidget):
     
     def __init__(self,teams,conexion,parent=None):#le pasamos la conexión al constructor para que lo pueda usar la clase estimate
         super().__init__(parent)
-        actualPath = os.path.dirname(os.path.realpath(__file__)) #para saber el directorio actual, usado para que sea compatible con las appimages
-        
         self.teams = teams
         self.conexion = conexion
         
         self.mainTeam2 = [] #El eqipo que creará el usuario
         
         self.setWindowTitle("SAJEF") 
-        self.setWindowIcon(QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
-        #self.setFixedSize(500, 500)
+        self.setWindowIcon(QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(os.path.dirname(os.path.realpath(__file__))))) #para saber el directorio actual, usado para que sea compatible con las appimages
         
         self.gridLayout = QGridLayout(self)
         self.setLayout(self.gridLayout)
-        self.hBoxLayoutPorteria = QVBoxLayout() #metemos la label y la lista de items
+        self.hBoxLayoutPorteria = QVBoxLayout()
         self.hBoxLayoutDefensa = QVBoxLayout()
         self.hBoxLayoutCentro = QVBoxLayout()
         self.hBoxLayoutAtaque = QVBoxLayout()
@@ -38,6 +35,8 @@ class MainWindow(QWidget):
         self.listItemDefensa = QListWidget()
         self.listItemCentro = QListWidget() #lista de items
         self.listItemAtaque = QListWidget()
+        self.combinatoricsTeam1 = QCheckBox("¿Quiere usar combinatoria para su equipo?")
+        self.combinatoricsTeam2 = QCheckBox("¿Quiere usar combinatoria para el equipo rival?")
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
         self.team2.currentTextChanged.connect(self.on_combobox_changed)
@@ -57,6 +56,8 @@ class MainWindow(QWidget):
         self.defaultTeam.clicked.connect(self.defaultTeam_button)
         
         self.gridLayout.addWidget(self.choose1,0,0)
+        self.gridLayout.addWidget(self.combinatoricsTeam1,0,1)
+        self.gridLayout.addWidget(self.combinatoricsTeam2,0,2)
         self.gridLayout.addWidget(self.choose2,0,3)
         self.gridLayout.addWidget(self.team1,1,0)
         self.gridLayout.addWidget(self.acept,1,1)
@@ -78,8 +79,8 @@ class MainWindow(QWidget):
         for index,item in enumerate(teams):
             self.team1.addItem(item[2:-2])     
             self.team2.addItem(item[2:-2])
-            self.team1.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
-            self.team2.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(actualPath)))
+            self.team1.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(os.path.dirname(os.path.realpath(__file__)))))
+            self.team2.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(os.path.dirname(os.path.realpath(__file__)))))
 
         
     def on_combobox_changed(self):
@@ -198,17 +199,20 @@ class MainWindow(QWidget):
             if self.listItemAtaque.item(index).checkState() == Qt.Checked:
                 self.mainTeam2.append(self.listItemAtaque.item(index).text())
                 counter = counter + 1
-                
+
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
-        elif counter != 11:
+        elif counter != 11:#si el equipo rival no tiene 11 jugadores
             self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
-        elif self.checkRepeatedPositions() == True:
+        elif self.checkRepeatedPositions() == True:#si hay posiciones repetidas en el equipo rival
             self.errorTeam.showMessage("Hay demasiados jugadores en una misma posición, revise de nuevo.")
-        else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y tambien las posiciones en las que juegan  
+        else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y también las posiciones en las que juegan  
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
     
-                
+        """
+        elif combinatoricsTeam2.isChecked() == true:#si esta elegida la combinatoria para el equipo rival no hace falta hacer mas comprobaciones
+            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)
+        """
 if __name__ == "__main__":
     #Conexión y consulta
     conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")

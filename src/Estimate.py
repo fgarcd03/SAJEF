@@ -15,13 +15,11 @@ class Estimate:
         self.mainTeam1 = []
         self.mainTeam2 = mainTeam2
         
-        self.createMainTeam1()#El equipo 2 no creamos mainTeam porque ya lo hace el usuario
-
+        self.mainTeam1 = self.createMainTeam(self.mainTeam1,self.team1)#El equipo 2 no creamos mainTeam porque ya lo hace el usuario
+        print(self.mainTeam1)
         self.mainTeam1 = self.overallCalculation(self.mainTeam1)
         self.mainTeam2 = self.overallCalculation(self.mainTeam2)
         
-        print(self.mainTeam1)
-        print(self.mainTeam2)
         if len(self.mainTeam1) != 11 or len(self.mainTeam2) != 11:
 
             print("Error, tamaño de equipo incorrecto")
@@ -70,8 +68,7 @@ class Estimate:
 
             file.close()
             
-            actual_path = os.path.dirname(os.path.realpath(__file__))
-            os.system("python3 {}/ResultsWindow.py &".format(actual_path))
+            os.system("python3 {}/ResultsWindow.py &".format(os.path.dirname(os.path.realpath(__file__))))
 
     def fileWrite(self,file,listOrInt):
         if isinstance(listOrInt, int) or isinstance(listOrInt, float) or isinstance(listOrInt, str):# si es int, float o cadena entra aquí si no será una lista
@@ -81,7 +78,7 @@ class Estimate:
                 file.write("%s;" % item)
             file.write("\n")  
     
-    def dataCache(self,players1):#esta función sirve para cachear algunos datos de la base de datos y aliviar de consultas a la misma
+    def dataCache(self,players):#esta función sirve para cachear algunos datos de la base de datos y aliviar de consultas a la misma
         #aquí cacheamos las posiciones
         positions = [["CBaLCBaRCB"], #hacemos una matriz para meter los datos de forma
                      ["LBaLWBaRBaRWB"],
@@ -94,19 +91,19 @@ class Estimate:
                      ["LWaRW"]] #el portero no lo necesitamos
         
         for i in range(len(positions)):
-            query = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid1}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid1=positions[i][0]))
+            query = self.conexion.query("MATCH (p:Position) WHERE p.id='{pid}' RETURN p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(pid=positions[i][0]))
             positions[i].extend(query)
         
         #aquí cacheamos los puntos de los jugadores
-        players1 = np.array([players1]).T.tolist() #convertimos la lista en una matriz vertical
+        players = np.array([players]).T.tolist() #convertimos la lista en una matriz vertical
 
-        for i in range(len(players1)):
-            query = self.conexion.query("MATCH (p:Player) WHERE p.name='{player1}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player1=players1[i][0].split(",")[0]))
-            players1[i].extend(query)
+        for i in range(len(players)):
+            query = self.conexion.query("MATCH (p:Player) WHERE p.name='{player}' RETURN  p.shooting,p.dribbling,p.defending,p.attackingCrossing,p.attackingFinishing,p.attackingHeadingAccuracy,p.attackingShortPassing,p.attackingVolleys,p.skillLongPassing,p.skillBallControl,p.movementAcceleration,p.movementSprintSpeed,p.movementAgility,p.movementReactions,p.movementBalance,p.powerShotPower,p.powerJumping,p.powerStamina,p.mentalityInterceptions,p.mentalityVision,p.mentalityComposure,p.defendingMarking,p.defendingSlidingTackle,p.defendingStandingTackle".format(player=players[i][0].split(",")[0]))
+            players[i].extend(query)
             
-        return positions,players1
+        return positions,players
     
-    def createMainTeam1(self):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
+    def createMainTeam(self,mainTeam,team):#modificar para que en realidad el equipo 1 coja el equipo de manera mas conveniente
         aux = [] #para meter los jugadores y posiciones junto a su puntuación total
         defense = []
         midfield = []
@@ -121,18 +118,18 @@ class Estimate:
         positionsMidfield = ["CDM","CM","LCM","RCM","CAM","LM","RM","RDM","LDM","LAM","RAM"]
         positionsForward = ["CF","ST","LW","RW","LS","RS"]
         
-        players1 = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(self.team1)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
-        players1 = [player.replace("'","") for player in players1] #limpiamos de comillas la lista de strings,corchetes y espacios
-        players1 = [player[1:-1] for player in players1]
+        players = self.conexion.query("MATCH (p)-[r:PLAYS]->(c) WHERE c.id='{}' RETURN DISTINCT p.name,r.teamPosition".format(team)) #obtenemos todos los jugadores y sus correspondientes posiciones en los equipos
+        players = [player.replace("'","") for player in players] #limpiamos de comillas la lista de strings,corchetes y espacios
+        players = [player[1:-1] for player in players]
         
-        grades,statistics = self.dataCache(players1)
-        #self.mainTeam1 = self.filterTeam(players1) #en caso de que no quiera hacer la combinatoria y facer el equipo sin más, descomentar esta línea y comentar lo que hay quedabo y en la línea de justo más arriba
+        grades,statistics = self.dataCache(players)
+        #mainTeam = self.filterTeam(players) #en caso de que no quiera hacer la combinatoria y facer el equipo sin más, descomentar esta línea y comentar lo que hay quedabo y en la línea de justo más arriba
         
         #Para elegir el equipo: el portero será el titular, con 4 defensas, 3 centrocanpistas y 3 delanteros
         #Recorremos con un for los jugadores
-        for player in players1:
+        for player in players:
             if player.split(",")[1] == " GK": #Si es portero titular lo añadimos sin mas
-                self.mainTeam1.append(player)
+                mainTeam.append(player)
             #El resto de jugadores los metemos en una lista según sea defensa,medio o ataque
             if "LB" in player or "LWB" in player or "LCB" in player or "RCB" in player or "RB" in player or "RWB" in player or "CB" in player:
                 defense.append(player)        
@@ -203,10 +200,12 @@ class Estimate:
                     for player in combination:
                         forward.append(player[1] + ", " + player[0])
         
-        self.mainTeam1.extend(defense)
-        self.mainTeam1.extend(midfield)
-        self.mainTeam1.extend(forward)
-    
+        mainTeam.extend(defense)
+        mainTeam.extend(midfield)
+        mainTeam.extend(forward)
+        
+        return mainTeam
+        
     def createMainTeamAux(self,player,grades,statistics):#le pasamos la lista, el jugador de la base de datos
         overall = 0
         oneGrade = []

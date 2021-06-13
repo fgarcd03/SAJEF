@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys 
-from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QTextEdit,QRadioButton,QTableWidget,QTableWidgetItem,QHeaderView
+import sys
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QTextEdit,QRadioButton,QTableWidget,QTableWidgetItem,QHeaderView,QLabel
 from PyQt5.QtGui import QIcon 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -18,7 +19,7 @@ class Window(QDialog):
         
         self.setWindowTitle("SAJEF-Resultados") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
-        self.setMinimumSize(1000, 650)
+        self.setMinimumSize(1000, 800)
         
         self.mainTeam1 = mainTeam1
         self.mainTeam2 = mainTeam2
@@ -43,7 +44,8 @@ class Window(QDialog):
         self.tableTeams = QTableWidget()
         self.tableTeams.setRowCount(2)
         self.tableTeams.setColumnCount(12)
-        self.header = self.tableTeams.horizontalHeader()
+        self.header = self.tableTeams.horizontalHeader() #usado para que para poder ajustar el tamaño de las celdas
+        self.labelOverall = QLabel("Los dos equipos con sus correspondientes jugadores y puntuaciones totales de cada uno de ellos")
         self.completeGraphic = QRadioButton("Gráfico completo",self)
         self.completeGraphic.setChecked(True)
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
@@ -54,21 +56,26 @@ class Window(QDialog):
         self.playerGraphic = QRadioButton("Gráfico de cada jugador",self)
         self.playerGraphic.clicked.connect(self.playerGraphicConnect)
         
-        self.tableTeams.setItem(0,0, QTableWidgetItem(self.team1))
-        self.tableTeams.setItem(1,0, QTableWidgetItem(self.team2))
+        item = QTableWidgetItem(self.team1)
+        item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+        self.tableTeams.setItem(0,0, QTableWidgetItem(item))
+        item = QTableWidgetItem(self.team2)
+        item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+        self.tableTeams.setItem(1,0, QTableWidgetItem(item))
+        self.header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         for column,player in enumerate(self.mainTeam1):
-            self.tableTeams.setItem(0,column+1, QTableWidgetItem(player))
-            self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents)
+            item = QTableWidgetItem(player) #creamos un item
+            item.setFlags(item.flags() ^ Qt.ItemIsEditable) #ponemos como no editable
+            self.tableTeams.setItem(0,column+1, item) #añadimos el item a la tabla
+            self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents) #ajustamos el tamaño de la columna
         for column,player in enumerate(self.mainTeam2):
-            self.tableTeams.setItem(1,column+1, QTableWidgetItem(player))
+            item = QTableWidgetItem(player) 
+            item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+            self.tableTeams.setItem(1,column+1, item)
             self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents)
 
         
         self.textEdit = QTextEdit("·Más datos recogidos de los dos equipos.")
-        """
-        self.textEdit.append(" ".join(("·Primer equipo (jugador, posición, puntos individuales): " + self.team1 + " " + str(self.mainTeam1)).replace("[","(").replace("]",")").replace("'","").replace(",",", ").split())) #cambiamos los corchetes por paréntesis, quitamos las comillas, añadimos un espacio después de la coma y ' '.join(mystring.split()) es para quitar los dos espacios seguidos formados en algunos sitios donde al hacer el replace añadio un espacio no necesario 
-        self.textEdit.append(" ".join(("·Segundo equipo (jugador, posición, puntos individuales): " + self.team2 + " " + str(self.mainTeam2)).replace("[","(").replace("]",")").replace("'","").replace(",",", ").split()))
-        """
         self.textEdit.append("")
         
         self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total): ")
@@ -96,13 +103,13 @@ class Window(QDialog):
             self.textEdit.append("    -Por lo tanto al tener más puntos tiene más posibilidad de ganar el " + self.team2 + ".")
         self.textEdit.setReadOnly(True)
         
-        
         self.figure = plt.figure() 
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
         self.layout = QVBoxLayout()
-        self.layout.addWidget(self.tableTeams,1.75)#el segundo argumento es el tamaño respecto a lo demás?
+        self.layout.addWidget(self.labelOverall)
+        self.layout.addWidget(self.tableTeams,1)#el segundo argumento es el tamaño respecto a lo demás?
         self.layout.addWidget(self.textEdit,2)
         self.layout.addWidget(self.canvas,2)
         self.layout.addWidget(self.toolbar)
