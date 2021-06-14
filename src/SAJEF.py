@@ -37,9 +37,10 @@ class MainWindow(QWidget):
         self.listItemAtaque = QListWidget()
         self.combinatoricsTeam1 = QCheckBox("¿Quiere usar combinatoria para su equipo?")
         self.combinatoricsTeam2 = QCheckBox("¿Quiere usar combinatoria para el equipo rival?")
+        self.combinatoricsTeam2.clicked.connect(self.combinatoricsTeam2CheckBox)
         self.team1 = QComboBox(self)
         self.team2 = QComboBox(self)
-        self.team2.currentTextChanged.connect(self.on_combobox_changed)
+        self.team2.currentTextChanged.connect(self.combobox2)
         self.choose1 = QLabel("Elija su Equipo")
         self.choose2 = QLabel("Elija el Equipo Rival")
         self.porteria = QLabel("Portería")
@@ -52,8 +53,8 @@ class MainWindow(QWidget):
         self.ataque.setAlignment(Qt.AlignCenter)
         self.acept = QPushButton("Aceptar")
         self.defaultTeam = QPushButton("Equipo por Defecto")
-        self.acept.clicked.connect(self.accept_button) #evento para manejar el click del boton aceptar
-        self.defaultTeam.clicked.connect(self.defaultTeam_button)
+        self.acept.clicked.connect(self.acceptButton) #evento para manejar el click del botón aceptar
+        self.defaultTeam.clicked.connect(self.defaultTeamButton)
         
         self.gridLayout.addWidget(self.choose1,0,0)
         self.gridLayout.addWidget(self.combinatoricsTeam1,0,1)
@@ -83,7 +84,7 @@ class MainWindow(QWidget):
             self.team2.setItemIcon(index, QIcon('{}/../resources/iconmonstr-soccer-1-240.png'.format(os.path.dirname(os.path.realpath(__file__)))))
 
         
-    def on_combobox_changed(self):
+    def combobox2(self):
         #eliminamos los itemAntiguos
         self.listItemPorteria.clear()
         self.listItemDefensa.clear()
@@ -105,10 +106,13 @@ class MainWindow(QWidget):
                 self.listItemDefensa.addItem(itemPlayer)   
             if "CDM" in player or "LDM" in player or "RDM" in player or "CM" in player or "LM" in player or "LCM" in player or "RM" in player or "RCM" in player or "CAM" in player or "LAM" in player or "RAM" in player:
                 self.listItemCentro.addItem(itemPlayer)
-            if "CF" in player or "LS" in player or "RS" in player or "ST" in player or "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player: #los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de bésqueda)
+            if "CF" in player or "LS" in player or "RS" in player or "ST" in player or "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player: #los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
                 self.listItemAtaque.addItem(itemPlayer)
+        
+        if self.combinatoricsTeam2.isChecked():#si el checkbox de combinatoria del equipo 2 está activado tenemos que deshabilitar los checkboxes
+            self.combinatoricsTeam2CheckBox()
 
-    def defaultTeam_button(self):
+    def defaultTeamButton(self):
          for index in range(self.listItemPorteria.count()):
             if "SUB" in self.listItemPorteria.item(index).text() or "RES" in self.listItemPorteria.item(index).text():
                 self.listItemPorteria.item(index).setCheckState(Qt.Unchecked)# si son suplentes los desmarcamos
@@ -132,6 +136,27 @@ class MainWindow(QWidget):
                 self.listItemAtaque.item(index).setCheckState(Qt.Unchecked)
             else:
                 self.listItemAtaque.item(index).setCheckState(Qt.Checked)
+    
+    def combinatoricsTeam2CheckBox(self):
+        if self.combinatoricsTeam2.isChecked():
+            for index in range(self.listItemPorteria.count()):
+                self.listItemPorteria.item(index).setFlags(self.listItemPorteria.item(index).flags() & ~Qt.ItemIsEnabled)
+            for index in range(self.listItemDefensa.count()):
+                self.listItemDefensa.item(index).setFlags(self.listItemDefensa.item(index).flags() & ~Qt.ItemIsEnabled)
+            for index in range(self.listItemCentro.count()):
+                self.listItemCentro.item(index).setFlags(self.listItemCentro.item(index).flags() & ~Qt.ItemIsEnabled)
+            for index in range(self.listItemAtaque.count()):
+                self.listItemAtaque.item(index).setFlags(self.listItemAtaque.item(index).flags() & ~Qt.ItemIsEnabled)
+        #Qt.NoItemFlags
+        else:
+            for index in range(self.listItemPorteria.count()):
+                self.listItemPorteria.item(index).setFlags(self.listItemPorteria.item(index).flags() | Qt.ItemIsEnabled)
+            for index in range(self.listItemDefensa.count()):
+                self.listItemDefensa.item(index).setFlags(self.listItemDefensa.item(index).flags() | Qt.ItemIsEnabled)
+            for index in range(self.listItemCentro.count()):
+                self.listItemCentro.item(index).setFlags(self.listItemCentro.item(index).flags() | Qt.ItemIsEnabled)
+            for index in range(self.listItemAtaque.count()):
+                self.listItemAtaque.item(index).setFlags(self.listItemAtaque.item(index).flags() | Qt.ItemIsEnabled)
     
     def checkRepeatedPositions(self):#comprobamos si hay más jugadores que posiciones disponibles, por ejemplo que no haya mas de 3 centrales
         counterGK = counterCM = counterST = False
@@ -180,7 +205,7 @@ class MainWindow(QWidget):
                 
         return False        
     
-    def accept_button(self):
+    def acceptButton(self):
         self.mainTeam2.clear()
         counter = 0
         for index in range(self.listItemPorteria.count()):
@@ -202,17 +227,15 @@ class MainWindow(QWidget):
 
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
+        elif self.combinatoricsTeam2.isChecked():#si esta elegida la combinatoria para el equipo rival no hace falta hacer mas comprobaciones
+            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),[],self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le mandamos una lista vacía en vez mainTeam2 ya que si eliges la opción no tiene sentido enviarle ningún jugador
         elif counter != 11:#si el equipo rival no tiene 11 jugadores
             self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
         elif self.checkRepeatedPositions() == True:#si hay posiciones repetidas en el equipo rival
             self.errorTeam.showMessage("Hay demasiados jugadores en una misma posición, revise de nuevo.")
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y también las posiciones en las que juegan  
-            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
-    
-        """
-        elif combinatoricsTeam2.isChecked() == true:#si esta elegida la combinatoria para el equipo rival no hace falta hacer mas comprobaciones
-            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2)
-        """
+            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2,self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
+        
 if __name__ == "__main__":
     #Conexión y consulta
     conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
