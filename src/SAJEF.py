@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QEr
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
+from threading import Thread
+
 import Conexion #archivo de la conexión con Neo4j para hacer consultas
 import Estimate #archivo donde va el algoritmo de cálculo
 
@@ -186,6 +188,11 @@ class MainWindow(QWidget):
         return False        
     
     def acceptButton(self):
+        thread = Thread(target = self.aceptar)
+        thread.start()
+        #thread.join()
+
+    def aceptar(self):    
         self.mainTeam2.clear()
         counter = 0
         for index in range(self.listItemPorteria.count()):
@@ -216,6 +223,7 @@ class MainWindow(QWidget):
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y también las posiciones en las que juegan  
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2,self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
         
+
 if __name__ == "__main__":
     #Conexión y consulta
     conexion = Conexion.Neo4j("bolt://localhost:7687", "neo4j", "SIBI20")
