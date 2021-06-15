@@ -4,7 +4,7 @@
 import sys
 import os
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout,QCheckBox
+from PyQt5.QtWidgets import QComboBox,QPushButton,QGridLayout,QWidget,QLabel,QErrorMessage,QListWidget,QVBoxLayout,QCheckBox,QMessageBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt #para el Qt.Horizontal
 
@@ -30,7 +30,18 @@ class MainWindow(QWidget):
         self.hBoxLayoutCentro = QVBoxLayout()
         self.hBoxLayoutAtaque = QVBoxLayout()
         
-        self.errorTeam = QErrorMessage()
+        self.errorTeam = QMessageBox()
+        self.errorTeam.setWindowTitle("Error")
+        self.errorTeam.setText("No puedes elegir el mismo equipo")
+        self.errorTeam.setIcon(QMessageBox.Critical)
+        self.error11 = QMessageBox()
+        self.error11.setWindowTitle("Error")
+        self.error11.setText("El equipo tiene que estar compuesto por exactamente 11 jugadores")
+        self.error11.setIcon(QMessageBox.Critical)
+        self.errorPos = QMessageBox()
+        self.errorPos.setWindowTitle("Error")
+        self.errorPos.setText("Hay demasiados jugadores en una misma posición, revise de nuevo.")
+        self.errorPos.setIcon(QMessageBox.Critical)
         self.listItemPorteria = QListWidget()
         self.listItemDefensa = QListWidget()
         self.listItemCentro = QListWidget() #lista de items
@@ -147,7 +158,6 @@ class MainWindow(QWidget):
                 self.listItemCentro.item(index).setFlags(self.listItemCentro.item(index).flags() & ~Qt.ItemIsEnabled)
             for index in range(self.listItemAtaque.count()):
                 self.listItemAtaque.item(index).setFlags(self.listItemAtaque.item(index).flags() & ~Qt.ItemIsEnabled)
-        #Qt.NoItemFlags
         else:
             for index in range(self.listItemPorteria.count()):
                 self.listItemPorteria.item(index).setFlags(self.listItemPorteria.item(index).flags() | Qt.ItemIsEnabled)
@@ -158,51 +168,21 @@ class MainWindow(QWidget):
             for index in range(self.listItemAtaque.count()):
                 self.listItemAtaque.item(index).setFlags(self.listItemAtaque.item(index).flags() | Qt.ItemIsEnabled)
     
-    def checkRepeatedPositions(self):#comprobamos si hay más jugadores que posiciones disponibles, por ejemplo que no haya mas de 3 centrales
+    def checkRepeatedPositions(self):#comprobamos si hay más jugadores que posiciones disponibles, por ejemplo que haya 2 CB
+        positionsDictionary = {"GK" : False, "CB" : False,"RCB" : False, "LCB" : False,"LB" : False, "LWB" : False,"RB" : False, "RWB" : False,"CDM" : False, "LDM" : False,"RDM" : False, "CM" : False,"LM" : False, "LCM" : False,"RM" : False, "RCM" : False,"CAM" : False, "LAM" : False,"RAM" : False, "CF" : False,"LS" : False, "RS" : False,"ST" : False, "LW" : False,"RW" : False}
         counterGK = counterCM = counterST = False
         counterCB = counterLRB = counterCDM = counterLRM = counterCAM = counterCF = counterLRW = 0
-        for player in self.mainTeam2:
-            if "GK" in player:
-                if counterGK:
-                    return True
-                counterGK = True
-            if "CB" in player or "RCB" in player or "LCB" in player:
-                counterCB = counterCB + 1
-                if counterCB > 3: #si hay mas de 3 centrales damos error
-                    return True
-            if "LB" in player or "LWB" in player or "RB" in player or "RWB" in player:
-                counterLRB = counterLRB + 1
-                if counterLRB > 4:
-                    return True
-            if "CDM" in player or "LDM" in player or "RDM" in player:
-                counterCDM = counterCDM + 1
-                if counterCDM > 3:
-                    return True
-            if "CM" in player and "LCM" not in player and "RCM" not in player:
-                if counterCM:
-                    return True
-                counterCM = True  
-            if "LM" in player or "LCM" in player or "RM" in player or "RCM" in player:
-                counterLRM = counterLRM + 1
-                if counterLRM > 4:
-                    return True
-            if "CAM" in player or "LAM" in player or "RAM" in player:
-                counterCAM = counterCAM + 1
-                if counterCAM > 3:
-                    return True
-            if "CF" in player or "LS" in player or "RS" in player:
-                counterCF = counterCF + 1
-                if counterCF > 3:
-                    return True
-            if "ST" in player:
-                if counterST:
-                    return True
-                counterST = True
-            if "LW" in player or "RW" in player and "LWB" not in player and "RWB" not in player:
-                counterLRW = counterLRW + 1
-                if counterLRW > 2:
-                    return True           
-                
+        for positionPlayer in self.mainTeam2:
+            positionPlayer = positionPlayer.split(",")[1]#primero hacemos un split para separar la posición del nombre(y cogemos la posición) 
+            positionPlayer = positionPlayer.replace(" RES-","")#quitamos SUB,RES o espacios para que quede la posición sola(si no existe SUB o RES funciona igual)
+            positionPlayer = positionPlayer.replace(" SUB-","")
+            positionPlayer = positionPlayer.replace(" ","")
+            
+            if positionsDictionary[positionPlayer] == False:#sí la posición del jugador no ha sido cogido aún lo ponemos a True
+                positionsDictionary[positionPlayer] = True
+            else:#sí no, es que estaría un posición repetida
+                return True
+            
         return False        
     
     def acceptButton(self):
@@ -226,13 +206,13 @@ class MainWindow(QWidget):
                 counter = counter + 1
 
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
-            self.errorTeam.showMessage("No puedes elegir el mismo equipo.")
+            self.errorTeam.exec_()
         elif self.combinatoricsTeam2.isChecked():#si esta elegida la combinatoria para el equipo rival no hace falta hacer mas comprobaciones
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),[],self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le mandamos una lista vacía en vez mainTeam2 ya que si eliges la opción no tiene sentido enviarle ningún jugador
         elif counter != 11:#si el equipo rival no tiene 11 jugadores
-            self.errorTeam.showMessage("El número de jugadores elegido no es 11.")
+            self.error11.exec_()
         elif self.checkRepeatedPositions() == True:#si hay posiciones repetidas en el equipo rival
-            self.errorTeam.showMessage("Hay demasiados jugadores en una misma posición, revise de nuevo.")
+            self.errorPos.exec_()
         else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y también las posiciones en las que juegan  
             Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2,self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
         

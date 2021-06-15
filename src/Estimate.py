@@ -149,7 +149,6 @@ class Estimate:
         overall = 0
         oneGrade = []
         oneStatistics = []
-        #print(statistics)
         player = list(player) #convertimos la tupla a lista para que sea editable
         #hacemos los cambios pertinentes para adaptarlos a la base de datos(CM,ST y GK no hace falta)
         if player[0] == "CB" or player[0] == "RCB" or player[0] == "LCB":
@@ -296,7 +295,7 @@ class Estimate:
             if "CDM" in player or "CM" in player or "LCM" in player or "RCM" in player or "CAM" in player or "LM" in player or "RM" in player or "RDM" in player or "LDM" in player or "LAM" in player or "RAM" in player:
                 pointsMidfield = pointsMidfield + int(player.split(",")[2])
                 zoneMidfield.append(player)
-            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entrer en mas de un if(porque coincide el término de búsqueda)
+            if "CF" in player or "ST" in player or "LW" in player or "RW" in player or "LS" in player or "RS" in player and "LWB" not in player and "RWB" not in player:#los not in son para evitar que algunos jugadores entren en mas de un if(porque coincide el término de búsqueda)
                 pointsForward = pointsForward + int(player.split(",")[2])
                 zoneForward.append(player)
         
