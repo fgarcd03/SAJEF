@@ -188,11 +188,6 @@ class MainWindow(QWidget):
         return False        
     
     def acceptButton(self):
-        thread = Thread(target = self.aceptar)
-        thread.start()
-        #thread.join()
-
-    def aceptar(self):    
         self.mainTeam2.clear()
         counter = 0
         for index in range(self.listItemPorteria.count()):
@@ -211,18 +206,27 @@ class MainWindow(QWidget):
             if self.listItemAtaque.item(index).checkState() == Qt.Checked:
                 self.mainTeam2.append(self.listItemAtaque.item(index).text())
                 counter = counter + 1
-
+                
         if str(self.team1.currentText()) == str(self.team2.currentText()):#si los dos equipos son el mismo,mostramos un error
             self.errorTeam.exec_()
-        elif self.combinatoricsTeam2.isChecked():#si esta elegida la combinatoria para el equipo rival no hace falta hacer mas comprobaciones
-            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),[],self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le mandamos una lista vacía en vez mainTeam2 ya que si eliges la opción no tiene sentido enviarle ningún jugador
+        elif self.combinatoricsTeam2.isChecked():#si esta elegida la combinatoria para el equipo rival no hace falta hacer más comprobaciones
+            threadComb = Thread(target = self.aceptComb) #tanto aceptComb como aceptNoComb la ejecutamos en hilos diferentes
+            threadComb.start()
         elif counter != 11:#si el equipo rival no tiene 11 jugadores
             self.error11.exec_()
         elif self.checkRepeatedPositions() == True:#si hay posiciones repetidas en el equipo rival
             self.errorPos.exec_()
-        else:#si pulsa el boton de aceptar y es correcto, primero tenemos que obtener de la base de datos los jugadores de los dos equipos y también las posiciones en las que juegan  
-            Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2,self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
+        else:
+            threadNoComb = Thread(target = self.aceptNoComb)
+            threadNoComb.start()
+            #thread.join()
+
+
+    def aceptComb(self):
+        Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),[],self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le mandamos una lista vacía en vez mainTeam2 ya que si eliges la opción no tiene sentido enviarle ningún jugador
         
+    def aceptNoComb(self):
+        Estimate.Estimate(self.conexion,str(self.team1.currentText()),str(self.team2.currentText()),self.mainTeam2,self.combinatoricsTeam1.isChecked(),self.combinatoricsTeam2.isChecked())#le pasamos el nombre de los dos equipos y el equipo 2(el equipo 1 lo crea Estimate), creamos el nuevo objeto y ya se encarga de llamar a todos los métodos el solo
 
 if __name__ == "__main__":
     #Conexión y consulta

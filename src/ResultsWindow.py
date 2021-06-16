@@ -3,7 +3,7 @@
 
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QTextEdit,QRadioButton,QTableWidget,QTableWidgetItem,QHeaderView,QLabel
+from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QTextEdit,QRadioButton,QTableWidget,QTableWidgetItem,QHeaderView,QLabel,QHBoxLayout
 from PyQt5.QtGui import QIcon 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -19,7 +19,7 @@ class Window(QDialog):
         
         self.setWindowTitle("SAJEF-Resultados") 
         self.setWindowIcon(QIcon('../resources/iconmonstr-soccer-1-240.png'))
-        self.setMinimumSize(1000, 800)
+        self.setMinimumSize(900, 700)
         
         self.mainTeam1 = mainTeam1
         self.mainTeam2 = mainTeam2
@@ -75,7 +75,7 @@ class Window(QDialog):
             self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents)
 
         
-        self.textEdit = QTextEdit("·Más datos recogidos de los dos equipos.")
+        self.textEdit = QTextEdit("·Más datos recogidos de los dos equipos:")
         self.textEdit.append("")
         
         self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total): ")
@@ -107,19 +107,21 @@ class Window(QDialog):
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.labelOverall)
-        self.layout.addWidget(self.tableTeams,1)#el segundo argumento es el tamaño respecto a lo demás?
-        self.layout.addWidget(self.textEdit,2)
-        self.layout.addWidget(self.canvas,2)
-        self.layout.addWidget(self.toolbar)
+        self.layoutVertical = QVBoxLayout()
+        self.layoutRadioButtonHorizontal = QHBoxLayout() #ponemos los radio button en un layout horizontal y luego lo añadimos al vertical
+        self.layoutVertical.addWidget(self.labelOverall)
+        self.layoutVertical.addWidget(self.tableTeams,1)#el segundo argumento es el tamaño respecto a lo demás?
+        self.layoutVertical.addWidget(self.textEdit,2)
+        self.layoutVertical.addWidget(self.canvas,2)
+        self.layoutVertical.addWidget(self.toolbar)
 
-        self.layout.addWidget(self.completeGraphic)
-        self.layout.addWidget(self.zoneGraphic)
-        self.layout.addWidget(self.attackVSdefenseGraphic)
-        self.layout.addWidget(self.playerGraphic)
+        self.layoutRadioButtonHorizontal.addWidget(self.completeGraphic)
+        self.layoutRadioButtonHorizontal.addWidget(self.zoneGraphic)
+        self.layoutRadioButtonHorizontal.addWidget(self.attackVSdefenseGraphic)
+        self.layoutRadioButtonHorizontal.addWidget(self.playerGraphic)
 
-        self.setLayout(self.layout) 
+        self.layoutVertical.addLayout(self.layoutRadioButtonHorizontal)
+        self.setLayout(self.layoutVertical) 
         
         self.completeGraphicConnect() #Dibujamos un gráfico por defecto
         
