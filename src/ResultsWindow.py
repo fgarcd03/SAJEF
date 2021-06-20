@@ -51,7 +51,7 @@ class Window(QDialog):
         self.completeGraphic.clicked.connect(self.completeGraphicConnect)
         self.zoneGraphic = QRadioButton("Gráfico de zonas (defensa, medio, ataque)",self)
         self.zoneGraphic.clicked.connect(self.zoneGraphicConnect)
-        self.attackVSdefenseGraphic = QRadioButton("Gráfico de ataque VS defensa",self)
+        self.attackVSdefenseGraphic = QRadioButton("Gráfico de ataque vs. defensa",self)
         self.attackVSdefenseGraphic.clicked.connect(self.attackVSdefenseGraphicConnect)
         self.playerGraphic = QRadioButton("Gráfico de cada jugador",self)
         self.playerGraphic.clicked.connect(self.playerGraphicConnect)
@@ -75,32 +75,34 @@ class Window(QDialog):
             self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents)
 
         
-        self.textEdit = QTextEdit("·Más datos recogidos de los dos equipos:")
+        self.textEdit = QTextEdit("")
+        self.textEdit.append("Puntuaciones de equipo como conjunto (30% del total): ")
+        self.textEdit.append("    -" + self.team1+" " + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3,2))  +" puntos y " + self.team2 +  " {} puntos.".format(round(((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3,2)))
         self.textEdit.append("")
-        
-        self.textEdit.append("·Puntuaciones de equipo como conjunto (30% del total): ")
-        self.textEdit.append("    -" + self.team1+": " + str(round(((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3,2))  +" puntos y " + self.team2 +  ": {} puntos.".format(round(((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3,2)))
+        self.textEdit.append("Puntuaciones de cada zona del campo (20% del total): ")
+        self.textEdit.append("    -Puntos brutos sin ponderar:")
+        self.textEdit.append("        -Zona de defensa: " + self.team1 + " "+ str(round(self.pointsOverallDefense1,2))  +" puntos y " + self.team2 + " {}  puntos.".format(round(self.pointsOverallDefense2,2)))
+        self.textEdit.append("        -Zona del centro del campo: " + self.team1 + " "+ str(round(self.pointsOverallMidfield1,2))  +" puntos y " + self.team2 + " {}  puntos.".format(round(self.pointsOverallMidfield2,2)))
+        self.textEdit.append("        -Zona delantera: " + self.team1 + " "+ str(round(self.pointsOverallForward1,2))  +" puntos y " + self.team2 + " {}  puntos.".format(round(self.pointsOverallForward2,2)))
+        self.textEdit.append("    -Ponderado sobre el 20%")
+        self.textEdit.append("        -Puntos totales: " + self.team1 + " " + str(round(((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2,2)) + " puntos y " + self.team2 + " {}  puntos.".format(round(((pointsZones2/(SCOREADJUSTMENT+pointsZones2)*100))*0.2,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones de cada zona del campo (20% del total): ")
-        self.textEdit.append("    -Zona de defensa (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(self.pointsOverallDefense1,2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(self.pointsOverallDefense2,2)))
-        self.textEdit.append("    -Zona del centro del campo (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(self.pointsOverallMidfield1,2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(self.pointsOverallMidfield2,2)))
-        self.textEdit.append("    -Zona delantera (puntos brutos sin ponderar): " + self.team1 + ": "+ str(round(self.pointsOverallForward1,2))  +" puntos y " + self.team2 + ": {}  puntos.".format(round(self.pointsOverallForward2,2)))
-        self.textEdit.append("    -Con un total de puntos de (ponderado sobre el 20%): " + self.team1 + ": " + str(round(((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2,2)) + " puntos y " + self.team2 + ": {}  puntos.".format(round(((pointsZones2/(SCOREADJUSTMENT+pointsZones2)*100))*0.2,2)))
+        self.textEdit.append("Puntuaciones de ataque y defensa (30% del total):")
+        self.textEdit.append("    -Puntos brutos sin ponderar:")
+        self.textEdit.append("        -Ataque: " + self.team1 + " "+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + " {} puntos.".format(round(self.pointsAttack2,2)))
+        self.textEdit.append("        -Defensa: " + self.team1 + " "+ str(round(self.pointsDefense1,2)) +" puntos y "  + self.team2 + " {} puntos.".format(round(self.pointsDefense2,2)))
+        self.textEdit.append("    -Ponderado sobre el 30%:")
+        self.textEdit.append("        -Puntos totales: " + self.team1 + " "+ str(round(((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3,2)) +" puntos y "  + self.team2 + " {} puntos.".format(round(((pointsAttackDefense2/(SCOREADJUSTMENT+pointsAttackDefense2)*100))*0.3,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones de ataque y defensa (30% del total):")
-        self.textEdit.append("    -Ataque (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(self.pointsAttack1,2)) +" puntos y " + self.team2 + ": {} puntos.".format(round(self.pointsAttack2,2)))
-        self.textEdit.append("    -Defensa (puntos brutos sin ponderar): " + self.team1 + ":"+ str(round(self.pointsDefense1,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(self.pointsDefense2,2)))
-        self.textEdit.append("    -Que en total de ataque y defensa dan (ponderado sobre el 30%): " + self.team1 + ":"+ str(round(((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3,2)) +" puntos y "  + self.team2 + ": {} puntos.".format(round(((pointsAttackDefense2/(SCOREADJUSTMENT+pointsAttackDefense2)*100))*0.3,2)))
+        self.textEdit.append("Puntuaciones individuales de cada jugador totales (20% del total):")
+        self.textEdit.append("    -" + self.team1+" "+ str(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2,2)) +" puntos y " + self.team2 +  " {} puntos.".format(round(((self.pointsVSPlayers2/(SCOREADJUSTMENT+self.pointsVSPlayers2)*100))*0.2,2)))
         self.textEdit.append("")
-        self.textEdit.append("·Puntuaciones individuales de cada jugador totales (20% del total): ")
-        self.textEdit.append("    -" + self.team1+": "+ str(round(((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2,2)) +" puntos y " + self.team2 +  ": {} puntos.".format(round(((self.pointsVSPlayers2/(SCOREADJUSTMENT+self.pointsVSPlayers2)*100))*0.2,2)))
-        self.textEdit.append("")
-        self.textEdit.append("·Nota total (100% del total):")
-        self.textEdit.append("    -" + self.team1 + " consigue un total de puntos de: "+ str(round(totalTeam1,2)) + " y " + self.team2 + " consigue un total de puntos de: " + str(round(totalTeam2,2)) +".")
+        self.textEdit.append("Nota final (100% del total):")
+        self.textEdit.append("    -" + self.team1 + " consigue un total de "+ str(round(totalTeam1,2)) + " puntos y " + self.team2 + " consigue un total de " + str(round(totalTeam2,2)) +" puntos.")
         if winTeam1 == True:
-            self.textEdit.append("    -Por lo tanto al tener más puntos tiene más posibilidad de ganar el " + self.team1 + ".")
+            self.textEdit.append("    -Al tener más puntos tiene más posibilidades de ganar el " + self.team1 + ".")
         else:
-            self.textEdit.append("    -Por lo tanto al tener más puntos tiene más posibilidad de ganar el " + self.team2 + ".")
+            self.textEdit.append("    -Al tener más puntos tiene más posibilidades de ganar el " + self.team2 + ".")
         self.textEdit.setReadOnly(True)
         
         self.figure = plt.figure() 
@@ -237,6 +239,16 @@ class Window(QDialog):
         #pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
         pointsAttackDefense1 = self.pointsDefense1 - self.pointsAttack2
         pointsAttackDefense2 = self.pointsDefense2 - self.pointsAttack1
+        
+        print(pointsAttackDefense1)
+        print(pointsAttackDefense2)
+        
+        
+        if pointsAttackDefense1 < 0:
+            pointsAttackDefense1 = 0
+            
+        if pointsAttackDefense2 < 0:
+            pointsAttackDefense2 = 0
         
         totalTeam1 = (((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3) + (((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2) + (((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3) + (((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2)
         totalTeam2 = (((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3) + (((pointsZones2/(SCOREADJUSTMENT+pointsZones2)*100))*0.2) + (((pointsAttackDefense2/(SCOREADJUSTMENT+pointsAttackDefense2)*100))*0.3) + (((self.pointsVSPlayers2/(SCOREADJUSTMENT+self.pointsVSPlayers2)*100))*0.2)
