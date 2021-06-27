@@ -10,7 +10,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt 
 import numpy as np
 
-SCOREADJUSTMENT = 100000 #en vez de usar la formula tipo: (dato1/(dato1+dato2))*100, ahora usaremos (dato1/(dato1+ScoreAdjustment))*100
+SCOREADJUSTMENT = 100000 #usaremos la fórmula (dato/(dato+ScoreAdjustment))*100
 
 class Window(QDialog): 
        
@@ -146,20 +146,17 @@ class Window(QDialog):
     def plotOverall(self): 
         pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,winTeam1 = self.additionalCalculations()
         
-        # Values of each group
         bars1 = [((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3,((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3] #se calcula sobre 100 la puntuación para que no salgan números muy grandes y se multiplica por la ponderancia de cada división
         bars2 = [((pointsZones1/(pointsZones1+SCOREADJUSTMENT)*100))*0.2,((pointsZones2/(SCOREADJUSTMENT+pointsZones2)*100))*0.2]
         bars3 = [((pointsAttackDefense1/(pointsAttackDefense1+SCOREADJUSTMENT)*100))*0.3,((pointsAttackDefense2/(SCOREADJUSTMENT+pointsAttackDefense2)*100))*0.3]
         bars4 = [((self.pointsVSPlayers1/(self.pointsVSPlayers1+SCOREADJUSTMENT)*100))*0.2,((self.pointsVSPlayers2/(SCOREADJUSTMENT+self.pointsVSPlayers2)*100))*0.2]
          
-        # Create bars
         p1 = plt.bar([0,1], bars1, color='r', edgecolor='white', width=0.3)
         p2 = plt.bar([0,1], bars2, bottom=bars1, color='g', edgecolor='white', width=0.3)
         p3 = plt.bar([0,1], bars3, bottom=np.array(bars1)+np.array(bars2), color='b', edgecolor='white', width=0.3)
         p4 = plt.bar([0,1], bars4, bottom=np.array(bars1)+np.array(bars2)+np.array(bars3), color='y', edgecolor='white', width=0.3)
         
         
-        #Añadir bbox_to_anchor=(0.5, 1.15), ncol=2 al final de legend para que salga fuera del gráfico
         plt.legend((p1[0], p2[0],p3[0],p4[0]), ("Puntos de equipo como conjunto", "Puntos de cada zona del campo","Puntos de ataque y defensa","Puntos individuales de cada jugador totales"),loc="upper center") 
 
         plt.xticks([0,1], [self.team1,self.team2], fontweight='bold')
@@ -218,7 +215,7 @@ class Window(QDialog):
                     team2.append(int(player2.split(",")[2]))
                     labels.append(position1)
         
-        width = 0.2 #no se porque pero hay que ponerlo así
+        width = 0.2 #no se porque pero hay que ponerlo asi
         p1 = plt.bar(np.arange(len(labels)) + width/2, team1, color = 'b', width = 0.2)
         p2 = plt.bar(np.arange(len(labels)) - width/2, team2, color = 'g', width = 0.2)
 
@@ -235,14 +232,8 @@ class Window(QDialog):
         pointsZones1 = self.pointsOverallDefense1 + self.pointsOverallMidfield1 + self.pointsOverallForward1
         pointsZones2 = self.pointsOverallDefense2 + self.pointsOverallMidfield2 + self.pointsOverallForward2
         
-        #pointsAttackDefense1 = self.pointsAttack1 + self.pointsDefense1
-        #pointsAttackDefense2 = self.pointsAttack2 + self.pointsDefense2
         pointsAttackDefense1 = self.pointsDefense1 - self.pointsAttack2
         pointsAttackDefense2 = self.pointsDefense2 - self.pointsAttack1
-        
-        print(pointsAttackDefense1)
-        print(pointsAttackDefense2)
-        
         
         if pointsAttackDefense1 < 0:
             pointsAttackDefense1 = 0
