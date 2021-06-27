@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#Interfaz donde se muestran los resultados
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QApplication, QVBoxLayout,QTextEdit,QRadioButton,QTableWidget,QTableWidgetItem,QHeaderView,QLabel,QHBoxLayout
@@ -44,7 +45,7 @@ class Window(QDialog):
         self.tableTeams = QTableWidget()
         self.tableTeams.setRowCount(2)
         self.tableTeams.setColumnCount(12)
-        self.header = self.tableTeams.horizontalHeader() #usado para que para poder ajustar el tamaño de las celdas
+        self.header = self.tableTeams.horizontalHeader()
         self.labelOverall = QLabel("Los dos equipos con sus correspondientes jugadores y puntuaciones totales de cada uno de ellos")
         self.completeGraphic = QRadioButton("Gráfico completo",self)
         self.completeGraphic.setChecked(True)
@@ -64,10 +65,10 @@ class Window(QDialog):
         self.tableTeams.setItem(1,0, QTableWidgetItem(item))
         self.header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         for column,player in enumerate(self.mainTeam1):
-            item = QTableWidgetItem(player) #creamos un item
-            item.setFlags(item.flags() ^ Qt.ItemIsEditable) #ponemos como no editable
-            self.tableTeams.setItem(0,column+1, item) #añadimos el item a la tabla
-            self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents) #ajustamos el tamaño de la columna
+            item = QTableWidgetItem(player)
+            item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+            self.tableTeams.setItem(0,column+1, item)
+            self.header.setSectionResizeMode(column+1, QHeaderView.ResizeToContents)
         for column,player in enumerate(self.mainTeam2):
             item = QTableWidgetItem(player) 
             item.setFlags(item.flags() ^ Qt.ItemIsEditable)
@@ -110,9 +111,9 @@ class Window(QDialog):
         self.toolbar = NavigationToolbar(self.canvas, self)
         
         self.layoutVertical = QVBoxLayout()
-        self.layoutRadioButtonHorizontal = QHBoxLayout() #ponemos los radio button en un layout horizontal y luego lo añadimos al vertical
+        self.layoutRadioButtonHorizontal = QHBoxLayout()
         self.layoutVertical.addWidget(self.labelOverall)
-        self.layoutVertical.addWidget(self.tableTeams,1)#el segundo argumento es el tamaño respecto a lo demás?
+        self.layoutVertical.addWidget(self.tableTeams,1)
         self.layoutVertical.addWidget(self.textEdit,2)
         self.layoutVertical.addWidget(self.canvas,2)
         self.layoutVertical.addWidget(self.toolbar)
@@ -142,8 +143,8 @@ class Window(QDialog):
     def playerGraphicConnect(self):
         self.canvas.figure.clear()
         self.plotPlayers()
-        
-    def plotOverall(self): 
+    
+    def plotOverall(self):#dibujamos el primer gráfico
         pointsZones1,pointsZones2,pointsAttackDefense1,pointsAttackDefense2,totalTeam1,totalTeam2,winTeam1 = self.additionalCalculations()
         
         bars1 = [((self.pointsOverallMainTeam1/(self.pointsOverallMainTeam1+SCOREADJUSTMENT))*100)*0.3,((self.pointsOverallMainTeam2/(SCOREADJUSTMENT+self.pointsOverallMainTeam2))*100)*0.3] #se calcula sobre 100 la puntuación para que no salgan números muy grandes y se multiplica por la ponderancia de cada división
@@ -164,7 +165,7 @@ class Window(QDialog):
         
         self.canvas.draw() 
 
-    def plotZones(self):
+    def plotZones(self):#dibujamos el segundo gráfico
         bars1 = [(self.pointsOverallDefense1/(self.pointsOverallDefense1+SCOREADJUSTMENT))*100,(self.pointsOverallDefense2/(SCOREADJUSTMENT+self.pointsOverallDefense2))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de un apartado
         bars2 = [(self.pointsOverallMidfield1/(self.pointsOverallMidfield1+SCOREADJUSTMENT))*100,(self.pointsOverallMidfield2/(SCOREADJUSTMENT+self.pointsOverallMidfield2))*100]
         bars3 = [(self.pointsOverallForward1/(self.pointsOverallForward1+SCOREADJUSTMENT))*100,(self.pointsOverallForward2/(SCOREADJUSTMENT+self.pointsOverallForward2))*100]
@@ -180,7 +181,7 @@ class Window(QDialog):
         
         self.canvas.draw()
         
-    def plotAttackVSDefense(self):
+    def plotAttackVSDefense(self):#dibujamos el tercer gráfico
         bars1 = [(self.pointsDefense1/(self.pointsDefense1+SCOREADJUSTMENT))*100,(self.pointsDefense2/(SCOREADJUSTMENT+self.pointsDefense2))*100] #se calcula sobre 100 la puntuación para que no salgan números muy grandes, en este caso no se multiplica por la ponderancia ya que solo vemos los de un apartado
         bars2 = [(self.pointsAttack1/(self.pointsAttack1+SCOREADJUSTMENT))*100,(self.pointsAttack2/(SCOREADJUSTMENT+self.pointsAttack2))*100]
         
@@ -194,28 +195,28 @@ class Window(QDialog):
         
         self.canvas.draw()
         
-    def plotPlayers(self):
+    def plotPlayers(self):#dibujamos el cuarto gráfico
         team1 = []
         team2 = []
         labels = []
         
         for player1 in self.mainTeam1:
             for player2 in self.mainTeam2:
-                if "-" in player1.split(",")[1]:#si hay un "-" es que es suplente, entonces separamos la posición de manera diferente pero aseguramos que aunque sea suplente se meta en el gráfico
+                if "-" in player1.split(",")[1]:
                     position1 = player1.split(",")[1].split("-")[1]
-                else:#no es suplente
-                    position1 = player1.split(",")[1].replace(" ","") #quitamos el espacio del principio
-                if "-" in player2.split(",")[1]:# el split no haría falta si no fuera por que hay jugadores que tienen guiones en el nombre
+                else:
+                    position1 = player1.split(",")[1].replace(" ","")
+                if "-" in player2.split(",")[1]:
                     position2 = player2.split(",")[1].split("-")[1]
                 else:
-                    position2 = player2.split(",")[1].replace(" ","") #quitamos el espacio del principio
+                    position2 = player2.split(",")[1].replace(" ","")
                     
-                if position1 == position2:#si coincide las posiciones las guardamos y sus puntuaciones
+                if position1 == position2:
                     team1.append(int(player1.split(",")[2]))
                     team2.append(int(player2.split(",")[2]))
                     labels.append(position1)
         
-        width = 0.2 #no se porque pero hay que ponerlo asi
+        width = 0.2
         p1 = plt.bar(np.arange(len(labels)) + width/2, team1, color = 'b', width = 0.2)
         p2 = plt.bar(np.arange(len(labels)) - width/2, team2, color = 'g', width = 0.2)
 

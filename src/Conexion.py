@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#Conexión a la base de datos
 from neo4j import GraphDatabase
 
 class Neo4j:
